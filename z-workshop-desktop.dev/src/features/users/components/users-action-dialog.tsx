@@ -1,9 +1,11 @@
 'use client'
 
 import { z } from 'zod'
+import axios from 'axios'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { toast } from '@/hooks/use-toast'
+import { handleQueryError } from '@/utils'
+// import { toast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -29,14 +31,15 @@ import { User } from '../data/schema'
 
 const formSchema = z
   .object({
-    firstName: z.string().min(1, { message: 'First Name is required.' }),
-    lastName: z.string().min(1, { message: 'Last Name is required.' }),
+    userId: z.string().optional(),
+    // firstName: z.string().min(1, { message: 'First Name is required.' }),
+    // lastName: z.string().min(1, { message: 'Last Name is required.' }),
     username: z.string().min(1, { message: 'Username is required.' }),
-    phoneNumber: z.string().min(1, { message: 'Phone number is required.' }),
-    email: z
-      .string()
-      .min(1, { message: 'Email is required.' })
-      .email({ message: 'Email is invalid.' }),
+    // phoneNumber: z.string().min(1, { message: 'Phone number is required.' }),
+    // email: z
+    //   .string()
+    //   .min(1, { message: 'Email is required.' })
+    //   .email({ message: 'Email is invalid.' }),
     password: z.string().transform((pwd) => pwd.trim()),
     role: z.string().min(1, { message: 'Role is required.' }),
     confirmPassword: z.string().transform((pwd) => pwd.trim()),
@@ -47,15 +50,15 @@ const formSchema = z
       if (password === '') {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Password is required.',
+          message: 'Hãy nhập mật khẩu.',
           path: ['password'],
         })
       }
 
-      if (password.length < 8) {
+      if (password.length < 6) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Password must be at least 8 characters long.',
+          message: 'Mật khẩu cần ít nhất 6 ký tự.',
           path: ['password'],
         })
       }
@@ -63,7 +66,7 @@ const formSchema = z
       if (!password.match(/[a-z]/)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Password must contain at least one lowercase letter.',
+          message: 'Cần chứa ít nhất một chữ thường.',
           path: ['password'],
         })
       }
@@ -71,7 +74,7 @@ const formSchema = z
       if (!password.match(/\d/)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Password must contain at least one number.',
+          message: 'Cần có ít nhất một kí tự số.',
           path: ['password'],
         })
       }
@@ -79,7 +82,7 @@ const formSchema = z
       if (password !== confirmPassword) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Passwords don't match.",
+          message: "Mật khẩu không khớp.",
           path: ['confirmPassword'],
         })
       }
@@ -91,9 +94,15 @@ interface Props {
   currentRow?: User
   open: boolean
   onOpenChange: (open: boolean) => void
+  onSuccess: () => void
 }
 
-export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
+export function UsersActionDialog({
+  currentRow,
+  open,
+  onOpenChange,
+  onSuccess,
+}: Props) {
   const isEdit = !!currentRow
   const form = useForm<UserForm>({
     resolver: zodResolver(formSchema),
@@ -105,29 +114,44 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
           isEdit,
         }
       : {
-          firstName: '',
-          lastName: '',
+          // firstName: '',
+          // lastName: '',
           username: '',
-          email: '',
+          // email: '',
           role: '',
-          phoneNumber: '',
+          // phoneNumber: '',
           password: '',
           confirmPassword: '',
           isEdit,
         },
   })
-
-  const onSubmit = (values: UserForm) => {
-    form.reset()
-    toast({
-      title: 'You submitted the following values:',
-      description: (
-        <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
-          <code className='text-white'>{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      ),
-    })
-    onOpenChange(false)
+  // console.log("is editing: " + isEdit);
+  const api = isEdit
+    ? `http://localhost:5062/api/Users/${currentRow.userId}`
+    : 'http://localhost:5062/api/Users'
+  const method = isEdit ? 'put' : 'post'
+  if (isEdit) console.log
+  const onSubmit = async (values: UserForm) => {
+    try {
+      await axios({
+        url: api,
+        method: method,
+        data: values,
+      })
+      form.reset()
+      onSuccess()?? onSuccess()
+      onOpenChange(false)
+    } catch (error: any) {
+      handleQueryError(error)
+    }
+    // toast({
+    //   title: 'You submitted the following values:',
+    //   description: (
+    //     <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
+    //       <code className='text-white'>{JSON.stringify(values, null, 2)}</code>
+    //     </pre>
+    //   ),
+    // })
   }
 
   const isPasswordTouched = !!form.formState.dirtyFields.password
@@ -142,10 +166,10 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
     >
       <DialogContent className='sm:max-w-lg'>
         <DialogHeader className='text-left'>
-          <DialogTitle>{isEdit ? 'Edit User' : 'Add New User'}</DialogTitle>
+          <DialogTitle>{isEdit ? 'Chỉnh sửa người dùng' : 'Thêm người dùng'}</DialogTitle>
           <DialogDescription>
-            {isEdit ? 'Update the user here. ' : 'Create new user here. '}
-            Click save when you&apos;re done.
+            {isEdit ? 'Cập nhật thông tin. ' : 'Thêm mới thông tin. '}
+            Ấn xác nhận khi đã hoàn thành.
           </DialogDescription>
         </DialogHeader>
         <div className='-mr-4 h-[26.25rem] w-full overflow-y-auto py-1 pr-4'>
@@ -156,6 +180,11 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
               className='space-y-4 p-0.5'
             >
               <FormField
+                control={form.control}
+                name='userId'
+                render={({ field }) => <input type='hidden' {...field} />}
+              />
+              {/* <FormField
                 control={form.control}
                 name='firstName'
                 render={({ field }) => (
@@ -194,14 +223,14 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
                     <FormMessage className='col-span-4 col-start-3' />
                   </FormItem>
                 )}
-              />
+              /> */}
               <FormField
                 control={form.control}
                 name='username'
                 render={({ field }) => (
                   <FormItem className='grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0'>
                     <FormLabel className='col-span-2 text-right'>
-                      Username
+                      Tên người dùng
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -214,7 +243,7 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
                   </FormItem>
                 )}
               />
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name='email'
                 render={({ field }) => (
@@ -251,14 +280,14 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
                     <FormMessage className='col-span-4 col-start-3' />
                   </FormItem>
                 )}
-              />
+              /> */}
               <FormField
                 control={form.control}
                 name='role'
                 render={({ field }) => (
                   <FormItem className='grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0'>
                     <FormLabel className='col-span-2 text-right'>
-                      Role
+                      Vai trò
                     </FormLabel>
                     <SelectDropdown
                       defaultValue={field.value}
@@ -280,7 +309,7 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
                 render={({ field }) => (
                   <FormItem className='grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0'>
                     <FormLabel className='col-span-2 text-right'>
-                      Password
+                      Mật khẩu
                     </FormLabel>
                     <FormControl>
                       <PasswordInput
@@ -299,7 +328,7 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
                 render={({ field }) => (
                   <FormItem className='grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0'>
                     <FormLabel className='col-span-2 text-right'>
-                      Confirm Password
+                      Xác nhận mật khẩu
                     </FormLabel>
                     <FormControl>
                       <PasswordInput
@@ -318,7 +347,7 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
         </div>
         <DialogFooter>
           <Button type='submit' form='user-form'>
-            Save changes
+            Xác nhận
           </Button>
         </DialogFooter>
       </DialogContent>

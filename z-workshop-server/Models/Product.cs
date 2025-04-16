@@ -5,7 +5,7 @@ namespace z_workshop_server.Models;
 
 public partial class Product
 {
-    public string Id { get; set; } = null!;
+    public string ProductId { get; set; } = null!;
 
     public string Name { get; set; } = null!;
 
@@ -17,7 +17,7 @@ public partial class Product
 
     public string? Desc { get; set; }
 
-    public DateTime CreateAt { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
     public DateTime? LastUpdate { get; set; }
 
@@ -31,7 +31,8 @@ public partial class Product
 
     public virtual Publisher Publisher { get; set; } = null!;
 
-    public virtual ICollection<PurchaseDetail> PurchaseDetails { get; set; } = new List<PurchaseDetail>();
+    public virtual ICollection<PurchaseDetail> PurchaseDetails { get; set; } =
+        new List<PurchaseDetail>();
 
     public virtual ICollection<Customer> Customers { get; set; } = new List<Customer>();
 

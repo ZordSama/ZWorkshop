@@ -1,3 +1,6 @@
+import { useEffect, useState } from 'react'
+import axios from 'axios'
+import { handleQueryError } from '@/utils'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
@@ -8,12 +11,26 @@ import { UsersDialogs } from './components/users-dialogs'
 import { UsersPrimaryButtons } from './components/users-primary-buttons'
 import { UsersTable } from './components/users-table'
 import UsersProvider from './context/users-context'
-import { userListSchema } from './data/schema'
-import { users } from './data/users'
+import { User, userListSchema } from './data/schema'
 
 export default function Users() {
-  // Parse user list
-  const userList = userListSchema.parse(users)
+  const [userList, setUserList] = useState<User[]>([])
+
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get('http://localhost:5062/api/Users')
+      // console.log(res.data)
+      const parsed = userListSchema.parse(res.data)
+      // console.log(parsed)
+      setUserList(parsed)
+    } catch (err: any) {
+      handleQueryError(err)
+    }
+  }
+  useEffect(() => {
+    // console.log('fetching users')
+    fetchUsers()
+  }, [])
 
   return (
     <UsersProvider>
@@ -28,9 +45,9 @@ export default function Users() {
       <Main>
         <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
           <div>
-            <h2 className='text-2xl font-bold tracking-tight'>User List</h2>
+            <h2 className='text-2xl font-bold tracking-tight'>Quản lý người dùng</h2>
             <p className='text-muted-foreground'>
-              Manage your users and their roles here.
+              Xem và quản lý danh sách người dùng.
             </p>
           </div>
           <UsersPrimaryButtons />
@@ -40,7 +57,7 @@ export default function Users() {
         </div>
       </Main>
 
-      <UsersDialogs />
+      <UsersDialogs onSuccess={fetchUsers} />
     </UsersProvider>
   )
 }

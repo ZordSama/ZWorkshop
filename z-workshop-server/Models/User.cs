@@ -5,15 +5,17 @@ namespace z_workshop_server.Models;
 
 public partial class User
 {
-    public string Id { get; set; } = null!;
+    public string UserId { get; set; } = null!;
 
     public string Username { get; set; } = null!;
 
-    public string Pwd { get; set; } = null!;
+    public string Password { get; set; } = null!;
+
+    public string Role { get; set; } = null!;
 
     public string? Avatar { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
     public DateTime? LastUpdate { get; set; }
 

@@ -5,7 +5,7 @@ namespace z_workshop_server.Models;
 
 public partial class Employee
 {
-    public string Id { get; set; } = null!;
+    public string EmployeeId { get; set; } = null!;
 
     public string Fullname { get; set; } = null!;
 
@@ -27,7 +27,7 @@ public partial class Employee
 
     public string UserId { get; set; } = null!;
 
-    public DateTime CreateAt { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
     public DateTime? LastUpdate { get; set; }
 

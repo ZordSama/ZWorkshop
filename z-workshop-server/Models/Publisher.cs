@@ -15,7 +15,7 @@ public partial class Publisher
 
     public string Email { get; set; } = null!;
 
-    public DateTime CreateAt { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
     public DateTime? LastUpdate { get; set; }
 

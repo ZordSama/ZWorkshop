@@ -1,4 +1,5 @@
 using z_workshop_server.Data;
+using z_workshop_server.Services;
 
 public class AuthMiddleware
 {
@@ -9,8 +10,10 @@ public class AuthMiddleware
         _next = next;
     }
 
-    public async Task Invoke(HttpContext context, AppDbContext db, IJwtServices jwt)
+    public async Task Invoke(HttpContext context)
     {
+        var jwt = context.RequestServices.GetRequiredService<IJwtServices>();
+        var _userService = context.RequestServices.GetRequiredService<UserService>();
         string? token = context
             .Request.Headers["Authorization"]
             .FirstOrDefault()
@@ -22,7 +25,7 @@ public class AuthMiddleware
             userId = jwt.ValidateToken(token);
         if (userId != null)
         {
-            context.Items["User"] = db.Users.FirstOrDefault(u => u.Id == userId)!;
+            context.Items["User"] = _userService.GetByIdAsync(userId);
         }
 
         await _next(context);

@@ -5,11 +5,11 @@ namespace z_workshop_server.Models;
 
 public partial class Customer
 {
-    public string Id { get; set; } = null!;
+    public string CustomerId { get; set; } = null!;
 
     public string Fullname { get; set; } = null!;
 
-    public string Payments { get; set; } = null!;
+    public string? Payments { get; set; }
 
     public DateOnly Dob { get; set; }
 
@@ -23,7 +23,7 @@ public partial class Customer
 
     public string UserId { get; set; } = null!;
 
-    public DateTime CreateAt { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
     public DateTime LastUpdate { get; set; }
 

@@ -31,17 +31,17 @@ export const sidebarData: SidebarData = {
   },
   teams: [
     {
-      name: 'Shadcn Admin',
+      name: 'ZWorkshop',
       logo: Command,
-      plan: 'Vite + ShadcnUI',
+      plan: 'Test APP',
     },
     {
-      name: 'Acme Inc',
+      name: 'Test Data',
       logo: GalleryVerticalEnd,
       plan: 'Enterprise',
     },
     {
-      name: 'Acme Corp.',
+      name: 'Test Data 2',
       logo: AudioWaveform,
       plan: 'Startup',
     },
@@ -56,35 +56,35 @@ export const sidebarData: SidebarData = {
           icon: IconDeviceGamepad2,
         },
         {
-          title: 'Dashboard',
+          title: 'Tổng quát',
           url: '/dashboard',
           icon: IconLayoutDashboard,
         },
         {
-          title: 'Tasks',
+          title: 'Hàng chờ',
           url: '/tasks',
           icon: IconChecklist,
         },
         {
-          title: 'Apps',
+          title: 'Quản lý sản phẩm',
           url: '/apps',
           icon: IconPackages,
         },
         {
-          title: 'Chats',
+          title: 'Nhóm nội bộ',
           url: '/chats',
           badge: '3',
           icon: IconMessages,
         },
         {
-          title: 'Users',
+          title: 'Quản lý người dùng',
           url: '/users',
           icon: IconUsers,
         },
       ],
     },
     {
-      title: 'Pages',
+      title: 'Trang test',
       items: [
         {
           title: 'Auth',
@@ -113,7 +113,7 @@ export const sidebarData: SidebarData = {
           ],
         },
         {
-          title: 'Errors',
+          title: 'Test báo lỗi',
           icon: IconBug,
           items: [
             {
@@ -146,7 +146,7 @@ export const sidebarData: SidebarData = {
       ],
     },
     {
-      title: 'Other',
+      title: 'Test khác',
       items: [
         {
           title: 'Settings',

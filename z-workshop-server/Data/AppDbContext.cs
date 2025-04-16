@@ -32,9 +32,9 @@ public partial class AppDbContext : DbContext
     {
         modelBuilder.Entity<Comment>(entity =>
         {
-            entity.Property(e => e.Id).HasMaxLength(32);
+            entity.Property(e => e.CommentId).HasMaxLength(32);
             entity
-                .Property(e => e.CreateAt)
+                .Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.ProductId).HasMaxLength(32);
@@ -71,9 +71,9 @@ public partial class AppDbContext : DbContext
 
             entity.HasIndex(e => e.Phone, "UK_Customer_Phone").IsUnique();
 
-            entity.Property(e => e.Id).HasMaxLength(32);
+            entity.Property(e => e.CustomerId).HasMaxLength(32);
             entity
-                .Property(e => e.CreateAt)
+                .Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.Email).HasMaxLength(500);
@@ -150,9 +150,9 @@ public partial class AppDbContext : DbContext
 
             entity.HasIndex(e => e.Phone, "UK_Employee_Phone").IsUnique();
 
-            entity.Property(e => e.Id).HasMaxLength(32);
+            entity.Property(e => e.EmployeeId).HasMaxLength(32);
             entity
-                .Property(e => e.CreateAt)
+                .Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.Email).HasMaxLength(500);
@@ -176,10 +176,10 @@ public partial class AppDbContext : DbContext
         {
             entity.ToTable("Product");
 
-            entity.Property(e => e.Id).HasMaxLength(32);
+            entity.Property(e => e.ProductId).HasMaxLength(32);
             entity.Property(e => e.ApprovedBy).HasMaxLength(32);
             entity
-                .Property(e => e.CreateAt)
+                .Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.Genre).HasMaxLength(255);
@@ -212,7 +212,7 @@ public partial class AppDbContext : DbContext
 
             entity.Property(e => e.Id).HasMaxLength(32);
             entity
-                .Property(e => e.CreateAt)
+                .Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.Email).HasMaxLength(500);
@@ -227,7 +227,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Id).HasMaxLength(32);
             entity.Property(e => e.CloseAt).HasColumnType("datetime");
             entity
-                .Property(e => e.CreateAt)
+                .Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.CustomerId).HasMaxLength(32);
@@ -273,14 +273,15 @@ public partial class AppDbContext : DbContext
 
             entity.HasIndex(e => e.Username, "idx_User_Username");
 
-            entity.Property(e => e.Id).HasMaxLength(32);
+            entity.Property(e => e.UserId).HasMaxLength(32);
             entity.Property(e => e.Avatar).HasMaxLength(255);
             entity
                 .Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.LastUpdate).HasColumnType("datetime");
-            entity.Property(e => e.Pwd).HasMaxLength(255);
+            entity.Property(e => e.Password).HasMaxLength(255);
+            entity.Property(e => e.Role).HasMaxLength(32);
             entity.Property(e => e.Username).HasMaxLength(255);
         });
 

@@ -15,11 +15,12 @@ public partial class Purchase
 
     public int Status { get; set; }
 
-    public DateTime CreateAt { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
     public DateTime? LastUpdate { get; set; }
 
     public virtual Customer Customer { get; set; } = null!;
 
-    public virtual ICollection<PurchaseDetail> PurchaseDetails { get; set; } = new List<PurchaseDetail>();
+    public virtual ICollection<PurchaseDetail> PurchaseDetails { get; set; } =
+        new List<PurchaseDetail>();
 }

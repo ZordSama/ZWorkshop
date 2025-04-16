@@ -2,11 +2,13 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using z_workshop_server.Models;
+using z_workshop_server.DTOs;
+
+namespace z_workshop_server.Services;
 
 public interface IJwtServices
 {
-    string GenerateToken(User user);
+    string GenerateToken(UserDTO user);
     string? ValidateToken(string token);
 }
 
@@ -19,12 +21,12 @@ public class JwtServices : IJwtServices
         _config = config;
     }
 
-    public string GenerateToken(User user)
+    public string GenerateToken(UserDTO user)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
         Claim[]? claims =
         [
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+            new Claim(JwtRegisteredClaimNames.Sub, user.UserId!),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         ];
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

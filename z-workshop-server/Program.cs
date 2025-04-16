@@ -4,12 +4,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using z_workshop_server.Data;
+using z_workshop_server.Helpers;
+using z_workshop_server.Repositories;
+using z_workshop_server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder
     .Services.AddAuthentication(options =>
@@ -32,7 +37,14 @@ builder
         };
     });
 
-builder.Services.AddScoped<IJwtServices, IJwtServices>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+
+builder.Services.AddScoped<IJwtServices, JwtServices>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<CustomerService>();
+builder.Services.AddScoped<EmployeeService>();
 
 builder.Services.AddCors();
 builder.Services.AddControllers();
