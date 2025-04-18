@@ -36,15 +36,15 @@ builder
             ClockSkew = TimeSpan.Zero
         };
     });
-
+builder.Services.AddScoped<IWorker, Worker>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
 builder.Services.AddScoped<IJwtServices, JwtServices>();
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<CustomerService>();
-builder.Services.AddScoped<EmployeeService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
 builder.Services.AddCors();
 builder.Services.AddControllers();

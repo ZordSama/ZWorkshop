@@ -65,7 +65,7 @@ public class JwtServices : IJwtServices
         }
         catch (Exception ex)
         {
-            System.Console.WriteLine(ex.Message);
+            Console.WriteLine(ex.Message);
             return null;
         }
     }

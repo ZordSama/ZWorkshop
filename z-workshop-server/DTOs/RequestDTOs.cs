@@ -2,6 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace z_workshop_server.DTOs;
 
+#region Accounts related requests DTOs
+
 public class LoginRequest
 {
     [Required(ErrorMessage = "Username is required")]
@@ -34,7 +36,7 @@ public class CustomerFormData
     public required string FullName { get; set; }
 
     [Required(ErrorMessage = "Dob is required")]
-    public required DateTime Dob { get; set; }
+    public required DateOnly Dob { get; set; }
 
     [Required(ErrorMessage = "Phone is required")]
     [RegularExpression(@"^\d{10}$", ErrorMessage = "Phone must be 10 digits")]
@@ -53,6 +55,9 @@ public class EmployeeFormData : CustomerFormData
 {
     [Required(ErrorMessage = "Role is required")]
     public required string Role { get; set; }
+
+    [Required(ErrorMessage = "Hired Date is required")]
+    public required DateTime HiredDate { get; set; }
 }
 
 public class CustomerRegisterRequest
@@ -66,3 +71,45 @@ public class EmployeeIssueRequest
     public required UserFormData UserFormData { get; set; }
     public required EmployeeFormData EmployeeFormData { get; set; }
 }
+#endregion
+
+#region Products related requests DTOs
+
+public class ProductFormData
+{
+    [Required(ErrorMessage = "Product name is required")]
+    [MaxLength(50, ErrorMessage = "Product name must be less than 50 characters")]
+    [MinLength(2, ErrorMessage = "Product name must be at least 2 characters")]
+    public required string Name { get; set; }
+
+    [Required(ErrorMessage = "Price is required")]
+    public required decimal Price { get; set; }
+    public required string Type { get; set; }
+    public required string Genre { get; set; }
+    public string? Desc { get; set; }
+    public required string PublisherId { get; set; }
+}
+
+public class PublisherFormData
+{
+    public string Name { get; set; } = null!;
+    public string Avt { get; set; } = null!;
+    public int Status { get; set; }
+    public string Email { get; set; } = null!;
+}
+#endregion
+
+#region Orders, User interacts related requests DTOs
+public class PurchaseRequest
+{
+    public required List<ProductToPurchaseDTO> ProductToPurchase { get; set; }
+}
+
+public class UserCommentRequest
+{
+    public bool Type { get; set; } = false;
+    public required string ResponseOf { get; set; }
+    public required string Content { get; set; }
+    public required string ProductId { get; set; }
+}
+#endregion

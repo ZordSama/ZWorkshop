@@ -13,7 +13,7 @@ public class AuthMiddleware
     public async Task Invoke(HttpContext context)
     {
         var jwt = context.RequestServices.GetRequiredService<IJwtServices>();
-        var _userService = context.RequestServices.GetRequiredService<UserService>();
+        var _userService = context.RequestServices.GetRequiredService<IUserService>();
         string? token = context
             .Request.Headers["Authorization"]
             .FirstOrDefault()
@@ -23,9 +23,12 @@ public class AuthMiddleware
         string? userId = null;
         if (token != null)
             userId = jwt.ValidateToken(token);
+        // Console.WriteLine(userId);
         if (userId != null)
         {
-            context.Items["User"] = _userService.GetByIdAsync(userId);
+            var result = await _userService.GetByIdAsync(userId);
+            var user = result.Data;
+            context.Items["User"] = user;
         }
 
         await _next(context);

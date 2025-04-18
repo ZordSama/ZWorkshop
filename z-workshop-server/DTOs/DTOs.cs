@@ -39,6 +39,12 @@ public class EmployeeDTO : PersonDTO
     public string EmployeeId { get; set; } = null!;
 }
 
+public class ProductToPurchaseDTO
+{
+    public required string ProductId { get; set; }
+    public int Quantity { get; set; }
+}
+
 // public class ZActionResult
 // {
 //     public bool Success { get; set; } = false;

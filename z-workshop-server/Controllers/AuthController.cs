@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using z_workshop_server.DTOs;
+using z_workshop_server.Services;
 
 namespace z_workshop_server.Controllers;
 
@@ -8,9 +9,9 @@ namespace z_workshop_server.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IJwtServices _jwt;
-    private readonly UserService _userService;
+    private readonly IUserService _userService;
 
-    public AuthController(IJwtServices jwt, UserService userService)
+    public AuthController(IJwtServices jwt, IUserService userService)
     {
         _jwt = jwt;
         _userService = userService;
@@ -31,9 +32,9 @@ public class AuthController : ControllerBase
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
-        var user = await _userService.UserLogin(request);
-        if (user == null)
-            return Unauthorized("invalid username or password");
-        return Ok(new { token = _jwt.GenerateToken(user) });
+        var result = await _userService.UserLogin(request);
+        if (result.IsSuccess)
+            return Ok(new { token = _jwt.GenerateToken(result.Data!) });
+        return Unauthorized(result.Message);
     }
 }

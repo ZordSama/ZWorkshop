@@ -71,6 +71,8 @@ public partial class AppDbContext : DbContext
 
             entity.HasIndex(e => e.Phone, "UK_Customer_Phone").IsUnique();
 
+            entity.HasIndex(e => e.UserId, "UK_Customer_UserId").IsUnique();
+
             entity.Property(e => e.CustomerId).HasMaxLength(32);
             entity
                 .Property(e => e.CreatedAt)
@@ -84,8 +86,8 @@ public partial class AppDbContext : DbContext
 
             entity
                 .HasOne(d => d.User)
-                .WithMany(p => p.Customers)
-                .HasForeignKey(d => d.UserId)
+                .WithOne(p => p.Customer)
+                .HasForeignKey<Customer>(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Customer_UserId");
 
@@ -150,6 +152,8 @@ public partial class AppDbContext : DbContext
 
             entity.HasIndex(e => e.Phone, "UK_Employee_Phone").IsUnique();
 
+            entity.HasIndex(e => e.UserId, "UK_Employee_UserId").IsUnique();
+
             entity.Property(e => e.EmployeeId).HasMaxLength(32);
             entity
                 .Property(e => e.CreatedAt)
@@ -166,8 +170,8 @@ public partial class AppDbContext : DbContext
 
             entity
                 .HasOne(d => d.User)
-                .WithMany(p => p.Employees)
-                .HasForeignKey(d => d.UserId)
+                .WithOne(p => p.Employee)
+                .HasForeignKey<Employee>(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Employee_UserId");
         });
@@ -209,6 +213,8 @@ public partial class AppDbContext : DbContext
             entity.ToTable("Publisher");
 
             entity.HasIndex(e => e.Email, "UK_Publisher_Email").IsUnique();
+
+            entity.HasIndex(e => e.Name, "UK_Publisher_Name").IsUnique();
 
             entity.Property(e => e.Id).HasMaxLength(32);
             entity

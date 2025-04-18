@@ -1,7 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using z_workshop_server.DTOs;
+using z_workshop_server.Services;
 
 namespace z_workshop_server.Controllers;
 
@@ -9,72 +9,57 @@ namespace z_workshop_server.Controllers;
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
-    private readonly UserService _userService;
+    private readonly IUserService _userService;
     private readonly IMapper _mapper;
 
-    public UsersController(UserService userService, IMapper mapper)
+    public UsersController(IUserService userService, IMapper mapper)
     {
         _userService = userService;
         _mapper = mapper;
     }
 
     [HttpGet]
-    [Authorize(Roles = "Admin, SuperAdmin")]
-    public IActionResult GetUsers()
+    // [Authorize(Roles = "Admin, SuperAdmin")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetUsers()
     {
-        return Ok(_userService.GetAll());
+        var result = await _userService.GetAllAsync();
+        if (result.IsSuccess)
+            return Ok(result);
+        return StatusCode(result.Code, result);
+    }
+
+    [HttpGet("{id}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetUserById(string id)
+    {
+        var result = await _userService.GetByIdAsync(id);
+        if (result.IsSuccess)
+            return Ok(result);
+        return StatusCode(result.Code, result);
     }
 
     [HttpPost("register")]
-    // [Authorize(Roles = "Admin, SuperAdmin")]
     [AllowAnonymous]
-    public async Task<IActionResult> CreateUser(
+    public async Task<IActionResult> RegisterUser(
         [FromBody] CustomerRegisterRequest customerRegisterRequest
     )
     {
-        try
-        {
-            if (
-                await _userService.GetByUsername(customerRegisterRequest.UserFormData.Username)
-                != null
-            )
-                return BadRequest("Username already exists");
-
-            UserAuthDTO userDTO = _mapper.Map<UserAuthDTO>(customerRegisterRequest.UserFormData);
-
-            userDTO.UserId = Guid.NewGuid().ToString("N");
-            userDTO.CreatedAt = DateTime.UtcNow;
-            userDTO.LastUpdate = DateTime.UtcNow;
-            userDTO.Role = "Customer";
-
-            CustomerDTO customerDTO = _mapper.Map<CustomerDTO>(
-                customerRegisterRequest.CustomerFormData
-            );
-            customerDTO.CustomerId = Guid.NewGuid().ToString("N");
-            customerDTO.UserId = userDTO.UserId;
-            customerDTO.CreatedAt = DateTime.UtcNow;
-            customerDTO.LastUpdate = DateTime.UtcNow;
-            customerDTO.Status = 0;
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        return StatusCode(500);
+        var result = await _userService.UserRegisterAsync(customerRegisterRequest);
+        if (result.IsSuccess)
+            return Ok(result);
+        return StatusCode(result.Code, result);
     }
 
-    // [HttpPost("issueAccount")]
-    // // [Authorize(Roles = "Admin, SuperAdmin")]
-    // [AllowAnonymous]
-    // public async Task<IActionResult> IssueAccount(
-    //     [FromBody] UserRegisterRequest employeeIssueRequest
-    // )
-    // {
-    //     if (!ModelState.IsValid)
-    //         return BadRequest(ModelState);
-    //     ZActionResult result = await _userService.Create();
-    //     if (result.Success)
-    //         return StatusCode(201, result);
-    //     return StatusCode(500, result);
-    // }
+    [HttpPost("employee-issue")]
+    [AllowAnonymous]
+    public async Task<IActionResult> EmployeeIssue(
+        [FromBody] EmployeeIssueRequest employeeIssueRequest
+    )
+    {
+        var result = await _userService.EmployeeIssueAsync(employeeIssueRequest);
+        if (result.IsSuccess)
+            return Ok(result);
+        return StatusCode(result.Code, result);
+    }
 }

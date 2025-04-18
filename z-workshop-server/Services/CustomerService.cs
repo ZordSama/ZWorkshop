@@ -6,7 +6,15 @@ using z_workshop_server.Repositories;
 
 namespace z_workshop_server.Services;
 
-public class CustomerService
+public interface ICustomerService
+{
+    Task<ZServiceResult<CustomerDTO>> GetByIdAsync(string id);
+    Task<ZServiceResult<List<CustomerDTO>>> GetAllAsync();
+    Task<ZServiceResult<CustomerDTO>> UpdateAsync(CustomerDTO customerDTO);
+    Task<ZServiceResult<string>> DeleteAsync(string id);
+}
+
+public class CustomerService : ICustomerService
 {
     protected readonly ICustomerRepository _customerRepository;
     protected readonly IMapper _mapper;
@@ -27,7 +35,7 @@ public class CustomerService
             var customer = await _customerRepository.GetByIdAsync(id);
 
             if (customer == null)
-                return ZServiceResult<CustomerDTO>.Failure("Customer not found");
+                return ZServiceResult<CustomerDTO>.Failure("Customer not found", 404);
 
             return ZServiceResult<CustomerDTO>.Success(
                 "Data dispached successfully",
@@ -62,13 +70,14 @@ public class CustomerService
         {
             var customer = await _customerRepository.GetByIdAsync(customerDTO.CustomerId);
             if (customer == null)
-                return ZServiceResult<CustomerDTO>.Failure("Customer not found");
+                return ZServiceResult<CustomerDTO>.Failure("Customer not found", 404);
 
             customer = _mapper.Map<Customer>(customerDTO);
             _customerRepository.Update(customer);
             await _worker.SaveChangesAsync();
             return ZServiceResult<CustomerDTO>.Success(
-                $"Updated User {customer.CustomerId} successfully"
+                $"Updated customer {customer.CustomerId} successfully",
+                _mapper.Map<CustomerDTO>(customer)
             );
         }
         catch (Exception ex)
@@ -77,23 +86,23 @@ public class CustomerService
         }
     }
 
-    public async Task<ZServiceResult<CustomerDTO>> DeleteAsync(string id)
+    public async Task<ZServiceResult<string>> DeleteAsync(string id)
     {
         try
         {
             var customer = await _customerRepository.GetByIdAsync(id);
             if (customer == null)
-                return ZServiceResult<CustomerDTO>.Failure("Customer not found");
+                return ZServiceResult<string>.Failure("Customer not found", 404);
 
             _customerRepository.Delete(customer);
             await _worker.SaveChangesAsync();
-            return ZServiceResult<CustomerDTO>.Success(
+            return ZServiceResult<string>.Success(
                 $"Deleted User {customer.CustomerId} successfully"
             );
         }
         catch (Exception ex)
         {
-            return ZServiceResult<CustomerDTO>.Failure(ex.Message);
+            return ZServiceResult<string>.Failure(ex.Message);
         }
     }
 }
