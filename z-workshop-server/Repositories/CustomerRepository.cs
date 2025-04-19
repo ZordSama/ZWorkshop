@@ -3,8 +3,6 @@ using z_workshop_server.Models;
 
 namespace z_workshop_server.Repositories;
 
-public interface ICustomerRepository : IRepository<Customer, string>;
+public interface ICustomerRepository : IRepository<Customer>;
 
-public class CustomerRepository(AppDbContext db)
-    : Repository<Customer, string>(db),
-        ICustomerRepository { }
+public class CustomerRepository(AppDbContext db) : Repository<Customer>(db), ICustomerRepository { }

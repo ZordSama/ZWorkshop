@@ -3,8 +3,6 @@ using z_workshop_server.Models;
 
 namespace z_workshop_server.Repositories;
 
-public interface IEmployeeRepository : IRepository<Employee, string> { }
+public interface IEmployeeRepository : IRepository<Employee> { }
 
-public class EmployeeRepository(AppDbContext db)
-    : Repository<Employee, string>(db),
-        IEmployeeRepository { }
+public class EmployeeRepository(AppDbContext db) : Repository<Employee>(db), IEmployeeRepository { }

@@ -1,5 +1,6 @@
 namespace z_workshop_server.DTOs;
 
+#region User related DTOs
 public class UserDTO
 {
     public string? UserId { get; set; }
@@ -44,15 +45,21 @@ public class ProductToPurchaseDTO
     public required string ProductId { get; set; }
     public int Quantity { get; set; }
 }
+#endregion
 
-// public class ZActionResult
-// {
-//     public bool Success { get; set; } = false;
-//     public string Message { get; set; } = null!;
+#region Product related DTOs
+public class ProductDTO
+{
+    public string ProductId { get; set; } = null!;
+    public required string Name { get; set; }
+    public decimal Price { get; set; }
+    public required string Type { get; set; }
+    public required string Genre { get; set; }
+    public required string? Desc { get; set; }
+    public DateTime? CreatedAt { get; set; }
+    public DateTime? LastUpdate { get; set; }
+    public string ApprovedBy { get; set; } = null!;
+    public string PublisherId { get; set; } = null!;
+}
 
-//     public ZActionResult(bool success, string message)
-//     {
-//         Success = success;
-//         Message = message;
-//     }
-// }
+#endregion

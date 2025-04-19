@@ -4,11 +4,15 @@ using z_workshop_server.Data;
 
 namespace z_workshop_server.Repositories;
 
-public interface IRepository<TEntity, TKey>
+public interface IRepository<TEntity>
     where TEntity : class
 {
-    Task<TEntity?> GetByIdAsync(TKey id);
+    Task<TEntity?> GetByIdAsync(params object[] keys);
     Task<TEntity?> GetByProperty<TProperty>(
+        Expression<Func<TEntity, TProperty>> propertySelector,
+        TProperty value
+    );
+    Task<List<TEntity>> GetAllByProperty<TProperty>(
         Expression<Func<TEntity, TProperty>> propertySelector,
         TProperty value
     );
@@ -18,7 +22,7 @@ public interface IRepository<TEntity, TKey>
     void Delete(TEntity entity);
 }
 
-public class Repository<TEntity, TKey> : IRepository<TEntity, TKey>
+public class Repository<TEntity> : IRepository<TEntity>
     where TEntity : class
 {
     protected readonly AppDbContext _dbContext;
@@ -30,9 +34,9 @@ public class Repository<TEntity, TKey> : IRepository<TEntity, TKey>
         _dbSet = dbContext.Set<TEntity>();
     }
 
-    public async Task<TEntity?> GetByIdAsync(TKey id)
+    public async Task<TEntity?> GetByIdAsync(params object[] keys)
     {
-        return await _dbSet.FindAsync(id);
+        return await _dbSet.FindAsync(keys);
     }
 
     public async Task<TEntity?> GetByProperty<TProperty>(
@@ -50,6 +54,21 @@ public class Repository<TEntity, TKey> : IRepository<TEntity, TKey>
         );
 
         return entity;
+    }
+
+    public async Task<List<TEntity>> GetAllByProperty<TProperty>(
+        Expression<Func<TEntity, TProperty>> propertySelector,
+        TProperty value
+    )
+    {
+        if (propertySelector.Body is not MemberExpression memberExpr)
+            throw new ArgumentException("The property selector must be a member expression.");
+
+        var propertyName = memberExpr.Member.Name;
+
+        return await _dbSet
+            .Where(e => EF.Property<TProperty>(e, propertyName)!.Equals(value))
+            .ToListAsync();
     }
 
     public async Task<List<TEntity>> GetAllAsync()

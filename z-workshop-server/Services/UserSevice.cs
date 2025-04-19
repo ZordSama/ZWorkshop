@@ -5,23 +5,18 @@ using z_workshop_server.Repositories;
 
 namespace z_workshop_server.Services;
 
-public interface IUserService
+public interface IUserService : IZBaseService<User, UserDTO>
 {
-    Task<ZServiceResult<UserDTO>> GetByIdAsync(string id);
     Task<ZServiceResult<UserDTO>> GetByUsername(string username);
-    Task<ZServiceResult<List<UserDTO>>> GetAllAsync();
     Task<ZServiceResult<UserDTO>> UserLogin(LoginRequest loginRequest);
     Task<ZServiceResult<string>> UserRegisterAsync(CustomerRegisterRequest customerRegisterRequest);
     Task<ZServiceResult<string>> EmployeeIssueAsync(EmployeeIssueRequest employeeIssueRequest);
 }
 
-public class UserService : IUserService
+public class UserService : ZBaseService<User, UserDTO>, IUserService
 {
-    protected readonly IUserRepository _userRepository;
     protected readonly ICustomerRepository _customerRepository;
     protected readonly IEmployeeRepository _employeeRepository;
-    protected readonly IMapper _mapper;
-    protected readonly IWorker _worker;
 
     public UserService(
         IUserRepository userRepository,
@@ -30,36 +25,17 @@ public class UserService : IUserService
         IMapper mapper,
         IWorker worker
     )
+        : base(userRepository, mapper, worker, "User")
     {
-        _userRepository = userRepository;
         _customerRepository = customerRepository;
         _employeeRepository = employeeRepository;
-        _mapper = mapper;
-        _worker = worker;
-    }
-
-    public async Task<ZServiceResult<UserDTO>> GetByIdAsync(string id)
-    {
-        try
-        {
-            var user = await _userRepository.GetByIdAsync(id);
-
-            if (user == null)
-                return ZServiceResult<UserDTO>.Failure("User not found", 404);
-
-            return ZServiceResult<UserDTO>.Success("", _mapper.Map<UserDTO>(user));
-        }
-        catch (Exception ex)
-        {
-            return ZServiceResult<UserDTO>.Failure(ex.Message);
-        }
     }
 
     public async Task<ZServiceResult<UserDTO>> GetByUsername(string userName)
     {
         try
         {
-            var user = await _userRepository.GetByProperty(u => u.Username, userName);
+            var user = await _repository.GetByProperty(u => u.Username, userName);
 
             if (user == null)
                 return ZServiceResult<UserDTO>.Failure("User not found", 404);
@@ -69,19 +45,6 @@ public class UserService : IUserService
         catch (Exception ex)
         {
             return ZServiceResult<UserDTO>.Failure(ex.Message);
-        }
-    }
-
-    public async Task<ZServiceResult<List<UserDTO>>> GetAllAsync()
-    {
-        try
-        {
-            var users = await _userRepository.GetAllAsync();
-            return ZServiceResult<List<UserDTO>>.Success("", _mapper.Map<List<UserDTO>>(users));
-        }
-        catch (Exception ex)
-        {
-            return ZServiceResult<List<UserDTO>>.Failure(ex.Message);
         }
     }
 
@@ -89,7 +52,7 @@ public class UserService : IUserService
     {
         try
         {
-            var user = await _userRepository.GetByProperty(u => u.Username, loginRequest.Username);
+            var user = await _repository.GetByProperty(u => u.Username, loginRequest.Username);
 
             if (user != null && BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.Password))
                 return ZServiceResult<UserDTO>.Success(
@@ -126,7 +89,7 @@ public class UserService : IUserService
             {
                 try
                 {
-                    await _userRepository.AddAsync(user);
+                    await _repository.AddAsync(user);
                     await _customerRepository.AddAsync(customer);
                     await _worker.SaveChangesAsync();
 
@@ -168,7 +131,7 @@ public class UserService : IUserService
             {
                 try
                 {
-                    await _userRepository.AddAsync(user);
+                    await _repository.AddAsync(user);
                     await _employeeRepository.AddAsync(employee);
                     await _worker.SaveChangesAsync();
 
