@@ -15,12 +15,16 @@ public class ZServiceResult<T>
         Code = code;
     }
 
-    public static ZServiceResult<T> Success(string message, T? data = default, int code = 200)
+    public static ZServiceResult<T> Success(
+        string message = "Success",
+        T? data = default,
+        int code = 200
+    )
     {
         return new ZServiceResult<T>(true, message, data, code);
     }
 
-    public static ZServiceResult<T> Failure(string message, int code = 500)
+    public static ZServiceResult<T> Failure(string message = "Failure", int code = 500)
     {
         return new ZServiceResult<T>(false, message, default, code);
     }

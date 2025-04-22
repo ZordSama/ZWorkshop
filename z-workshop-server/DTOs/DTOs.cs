@@ -3,7 +3,7 @@ namespace z_workshop_server.DTOs;
 #region User related DTOs
 public class UserDTO
 {
-    public string? UserId { get; set; }
+    public string UserId { get; set; } = null!;
     public string Username { get; set; } = null!;
     public string Role { get; set; } = null!;
     public string? Avatar { get; set; }

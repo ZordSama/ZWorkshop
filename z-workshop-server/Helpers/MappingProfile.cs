@@ -20,6 +20,7 @@ public class MappingProfile : Profile
 
         CreateMap<UserFormData, UserDTO>().ReverseMap();
         CreateMap<UserFormData, UserAuthDTO>().ReverseMap();
+        CreateMap<UserFormData, UserUpdateRequest>().ReverseMap();
 
         CreateMap<CustomerFormData, CustomerDTO>().ReverseMap();
 

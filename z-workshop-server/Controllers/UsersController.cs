@@ -19,13 +19,12 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    // [Authorize(Roles = "Admin, SuperAdmin")]
-    [AllowAnonymous]
+    [Authorize(Roles = "Admin, SuperAdmin")]
+    // [AllowAnonymous]
     public async Task<IActionResult> GetUsers()
     {
         var result = await _userService.GetAllAsync();
-        if (result.IsSuccess)
-            return Ok(result);
+
         return StatusCode(result.Code, result);
     }
 
@@ -34,8 +33,7 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> GetUserById(string id)
     {
         var result = await _userService.GetByIdAsync(id);
-        if (result.IsSuccess)
-            return Ok(result);
+
         return StatusCode(result.Code, result);
     }
 
@@ -46,8 +44,7 @@ public class UsersController : ControllerBase
     )
     {
         var result = await _userService.UserRegisterAsync(customerRegisterRequest);
-        if (result.IsSuccess)
-            return Ok(result);
+
         return StatusCode(result.Code, result);
     }
 
@@ -58,8 +55,46 @@ public class UsersController : ControllerBase
     )
     {
         var result = await _userService.EmployeeIssueAsync(employeeIssueRequest);
-        if (result.IsSuccess)
-            return Ok(result);
+
+        return StatusCode(result.Code, result);
+    }
+
+    [HttpPut("{id}")]
+    [Authorize(Roles = "Admin, SuperAdmin")]
+    public async Task<IActionResult> UpdateUser(
+        string id,
+        [FromBody] UserUpdateRequest userUpdateRequest
+    )
+    {
+        if (id != userUpdateRequest.UserId)
+            return BadRequest("Id does not match");
+
+        var result = await _userService.UpdateUserAsync(userUpdateRequest);
+
+        return StatusCode(result.Code, result);
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin, SuperAdmin")]
+    public async Task<IActionResult> DeleteUser(string id)
+    {
+        var result = await _userService.DeleteAsync(id);
+
+        return StatusCode(result.Code, result);
+    }
+
+    [HttpPost("change-password/{id}")]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword(
+        string id,
+        [FromBody] ChangePasswordRequest changePasswordRequest
+    )
+    {
+        if (id != changePasswordRequest.UserId)
+            return BadRequest("Id does not match");
+
+        var result = await _userService.UpdateUserAuthAsync(changePasswordRequest);
+
         return StatusCode(result.Code, result);
     }
 }

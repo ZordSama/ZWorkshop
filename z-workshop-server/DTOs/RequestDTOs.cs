@@ -13,7 +13,7 @@ public class LoginRequest
     public required string Password { get; set; }
 }
 
-public class UserFormData
+public class BaseUserForm
 {
     [Required(ErrorMessage = "Username is required")]
     [Length(3, 20, ErrorMessage = "Username must be between 3 and 20 characters")]
@@ -22,7 +22,10 @@ public class UserFormData
         ErrorMessage = "Username can only contain letters and numbers or underscore"
     )]
     public required string Username { get; set; }
+}
 
+public class UserFormData : BaseUserForm
+{
     [Required(ErrorMessage = "Password is required")]
     [Length(8, 20, ErrorMessage = "Password must be between 8 and 20 characters")]
     public required string Password { get; set; }
@@ -70,6 +73,18 @@ public class EmployeeIssueRequest
 {
     public required UserFormData UserFormData { get; set; }
     public required EmployeeFormData EmployeeFormData { get; set; }
+}
+
+public class UserUpdateRequest : BaseUserForm
+{
+    public required string UserId { get; set; }
+}
+
+public class ChangePasswordRequest
+{
+    public required string UserId { get; set; }
+    public required string OldPassword { get; set; }
+    public required string NewPassword { get; set; }
 }
 #endregion
 

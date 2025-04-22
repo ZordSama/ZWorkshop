@@ -11,6 +11,9 @@ public interface IUserService : IZBaseService<User, UserDTO>
     Task<ZServiceResult<UserDTO>> UserLogin(LoginRequest loginRequest);
     Task<ZServiceResult<string>> UserRegisterAsync(CustomerRegisterRequest customerRegisterRequest);
     Task<ZServiceResult<string>> EmployeeIssueAsync(EmployeeIssueRequest employeeIssueRequest);
+    Task<ZServiceResult<UserDTO>> UpdateUserAsync(UserUpdateRequest userUpdateRequest);
+    Task<ZServiceResult<string>> UpdateUserAuthAsync(ChangePasswordRequest changePasswordRequest);
+    Task<ZServiceResult<string>> ReIssueUserPassword(string UserId);
 }
 
 public class UserService : ZBaseService<User, UserDTO>, IUserService
@@ -85,26 +88,20 @@ public class UserService : ZBaseService<User, UserDTO>, IUserService
             var user = _mapper.Map<User>(userAuthDto);
             var customer = _mapper.Map<Customer>(customerDto);
 
-            using (var transaction = await _worker.BeginTransactionAsync())
+            using var transaction = await _worker.BeginTransactionAsync();
+            try
             {
-                try
-                {
-                    await _repository.AddAsync(user);
-                    await _customerRepository.AddAsync(customer);
-                    await _worker.SaveChangesAsync();
+                await _repository.AddAsync(user);
+                await _customerRepository.AddAsync(customer);
+                await _worker.SaveChangesAsync();
 
-                    await transaction.CommitAsync();
-                    return ZServiceResult<string>.Success(
-                        "user created successfully",
-                        default,
-                        201
-                    );
-                }
-                catch (Exception ex)
-                {
-                    await transaction.RollbackAsync();
-                    return ZServiceResult<string>.Failure(ex.Message);
-                }
+                await transaction.CommitAsync();
+                return ZServiceResult<string>.Success("user created successfully", default, 201);
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return ZServiceResult<string>.Failure(ex.Message);
             }
         }
         catch (Exception ex)
@@ -127,27 +124,100 @@ public class UserService : ZBaseService<User, UserDTO>, IUserService
             employee.EmployeeId = Guid.NewGuid().ToString("N");
             employee.UserId = user.UserId;
 
-            using (var transaction = await _worker.BeginTransactionAsync())
+            using var transaction = await _worker.BeginTransactionAsync();
+            try
             {
-                try
-                {
-                    await _repository.AddAsync(user);
-                    await _employeeRepository.AddAsync(employee);
-                    await _worker.SaveChangesAsync();
+                await _repository.AddAsync(user);
+                await _employeeRepository.AddAsync(employee);
+                await _worker.SaveChangesAsync();
 
-                    await transaction.CommitAsync();
-                    return ZServiceResult<string>.Success(
-                        "user created successfully",
-                        default,
-                        201
-                    );
-                }
-                catch (Exception ex)
-                {
-                    await transaction.RollbackAsync();
-                    return ZServiceResult<string>.Failure(ex.Message);
-                }
+                await transaction.CommitAsync();
+                return ZServiceResult<string>.Success("user created successfully", default, 201);
             }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return ZServiceResult<string>.Failure(ex.Message);
+            }
+        }
+        catch (Exception ex)
+        {
+            return ZServiceResult<string>.Failure(ex.Message);
+        }
+    }
+
+    public override async Task<ZServiceResult<string>> DeleteAsync(params object[] keys)
+    {
+        var user = await _repository.GetByIdAsync(keys);
+        if (user == null)
+            return ZServiceResult<string>.Failure("User not found", 404);
+        using var transaction = await _worker.BeginTransactionAsync();
+        try
+        {
+            var employee = await _employeeRepository.GetByProperty(e => e.EmployeeId, keys[0]);
+            if (employee != null)
+                _employeeRepository.Delete(employee);
+
+            var customer = await _customerRepository.GetByProperty(c => c.CustomerId, keys[0]);
+            if (customer != null)
+                _customerRepository.Delete(customer);
+
+            _repository.Delete(user);
+            await _worker.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+            return ZServiceResult<string>.Success($"User {user.Username} deleted successfully");
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            return ZServiceResult<string>.Failure(ex.Message);
+        }
+    }
+
+    public async Task<ZServiceResult<UserDTO>> UpdateUserAsync(UserUpdateRequest userUpdateRequest)
+    {
+        return await base.UpdateAsync(_mapper.Map<UserDTO>(userUpdateRequest));
+    }
+
+    public async Task<ZServiceResult<string>> UpdateUserAuthAsync(
+        ChangePasswordRequest changePasswordRequest
+    )
+    {
+        try
+        {
+            var user = await _repository.GetByIdAsync(changePasswordRequest.UserId);
+
+            if (user == null)
+                return ZServiceResult<string>.Failure("User not found", 404);
+
+            if (!BCrypt.Net.BCrypt.Verify(changePasswordRequest.OldPassword, user.Password))
+                return ZServiceResult<string>.Failure("Old password is incorrect", 401);
+
+            user.Password = BCrypt.Net.BCrypt.HashPassword(changePasswordRequest.NewPassword);
+            await _worker.SaveChangesAsync();
+
+            return ZServiceResult<string>.Success("User updated successfully");
+        }
+        catch (Exception ex)
+        {
+            return ZServiceResult<string>.Failure(ex.Message);
+        }
+    }
+
+    public async Task<ZServiceResult<string>> ReIssueUserPassword(string UserId)
+    {
+        try
+        {
+            var user = await _repository.GetByIdAsync(UserId);
+
+            if (user == null)
+                return ZServiceResult<string>.Failure("User not found", 404);
+
+            user.Password = BCrypt.Net.BCrypt.HashPassword("123456");
+            await _worker.SaveChangesAsync();
+
+            return ZServiceResult<string>.Success("User password reset successfully");
         }
         catch (Exception ex)
         {
