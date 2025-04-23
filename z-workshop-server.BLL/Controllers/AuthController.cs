@@ -6,16 +6,10 @@ namespace z_workshop_server.BLL.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController : ControllerBase
+public class AuthController(IJwtServices jwt, IUserService userService) : ControllerBase
 {
-    private readonly IJwtServices _jwt;
-    private readonly IUserService _userService;
-
-    public AuthController(IJwtServices jwt, IUserService userService)
-    {
-        _jwt = jwt;
-        _userService = userService;
-    }
+    private readonly IJwtServices _jwt = jwt;
+    private readonly IUserService _userService = userService;
 
     [HttpGet("me")]
     [Authorize]

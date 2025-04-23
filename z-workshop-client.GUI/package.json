@@ -1,5 +1,5 @@
 {
-  "name": "z-workshop",
+  "name": "z-workshop-client",
   "private": true,
   "version": "1.1.0",
   "type": "module",
@@ -18,8 +18,8 @@
     "electron:preview": "cross-env NODE_ENV=production electron electron/main.cjs"
   },
   "build": {
-    "appId": "com.zord.zworkshop",
-    "productName": "Shadcn Admin",
+    "appId": "com.zord.zworkshopclient",
+    "productName": "Z Workshop Client",
     "files": [
       "dist/**/*",
       "electron/main.cjs",

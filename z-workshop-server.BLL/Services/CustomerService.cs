@@ -10,6 +10,7 @@ public interface ICustomerService : IZBaseService<Customer, CustomerDTO>
 {
     Task<ZServiceResult<bool>> IsMailRegistered(string mail);
     Task<ZServiceResult<bool>> IsPhoneRegistered(string phone);
+    Task<ZServiceResult<CustomerDTO>> GetByUserId(string id);
 }
 
 public class CustomerService(ICustomerRepository repository, IMapper mapper, IWorker worker)
@@ -26,5 +27,13 @@ public class CustomerService(ICustomerRepository repository, IMapper mapper, IWo
     {
         var customer = await _repository.GetByProperty(c => c.Phone, phone);
         return ZServiceResult<bool>.Success("", customer != null);
+    }
+
+    public async Task<ZServiceResult<CustomerDTO>> GetByUserId(string id)
+    {
+        var customer = await _repository.GetByProperty(c => c.UserId, id);
+        return customer != null
+            ? ZServiceResult<CustomerDTO>.Success("", _mapper.Map<CustomerDTO>(customer))
+            : ZServiceResult<CustomerDTO>.Failure("Customer not found", 404);
     }
 }

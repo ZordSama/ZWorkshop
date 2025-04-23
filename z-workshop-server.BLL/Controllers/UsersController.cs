@@ -7,20 +7,12 @@ namespace z_workshop_server.BLL.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UsersController : ControllerBase
+public class UsersController(IUserService userService) : ControllerBase
 {
-    private readonly IUserService _userService;
-    private readonly IMapper _mapper;
-
-    public UsersController(IUserService userService, IMapper mapper)
-    {
-        _userService = userService;
-        _mapper = mapper;
-    }
+    private readonly IUserService _userService = userService;
 
     [HttpGet]
     [Authorize(Roles = "Admin, SuperAdmin")]
-    // [AllowAnonymous]
     public async Task<IActionResult> GetUsers()
     {
         var result = await _userService.GetAllAsync();
@@ -59,20 +51,20 @@ public class UsersController : ControllerBase
         return StatusCode(result.Code, result);
     }
 
-    [HttpPut("{id}")]
-    [Authorize(Roles = "Admin, SuperAdmin")]
-    public async Task<IActionResult> UpdateUser(
-        string id,
-        [FromBody] UserUpdateRequest userUpdateRequest
-    )
-    {
-        if (id != userUpdateRequest.UserId)
-            return BadRequest("Id does not match");
+    // [HttpPut("{id}")]
+    // [Authorize(Roles = "Admin, SuperAdmin, self")]
+    // public async Task<IActionResult> UpdateUser(
+    //     string id,
+    //     [FromBody] UserUpdateRequest userUpdateRequest
+    // )
+    // {
+    //     if (id != userUpdateRequest.UserId)
+    //         return BadRequest("Id does not match");
 
-        var result = await _userService.UpdateUserAsync(userUpdateRequest);
+    //     var result = await _userService.UpdateUserAsync(userUpdateRequest);
 
-        return StatusCode(result.Code, result);
-    }
+    //     return StatusCode(result.Code, result);
+    // }
 
     [HttpDelete("{id}")]
     [Authorize(Roles = "Admin, SuperAdmin")]
@@ -83,7 +75,7 @@ public class UsersController : ControllerBase
         return StatusCode(result.Code, result);
     }
 
-    [HttpPost("change-password/{id}")]
+    [HttpPatch("change-password/{id}")]
     [Authorize(Roles = "self")]
     public async Task<IActionResult> ChangePassword(
         string id,
@@ -98,7 +90,7 @@ public class UsersController : ControllerBase
         return StatusCode(result.Code, result);
     }
 
-    [HttpPost("re-issue-pwd/{id}")]
+    [HttpPatch("re-issue-pwd/{id}")]
     [Authorize(Roles = "Admin, SuperAdmin")]
     public async Task<IActionResult> ReIssuePwd(string id)
     {

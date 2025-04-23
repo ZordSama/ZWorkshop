@@ -9,6 +9,7 @@ public interface IEmployeeService : IZBaseService<Employee, EmployeeDTO>
 {
     Task<ZServiceResult<bool>> IsMailRegistered(string mail);
     Task<ZServiceResult<bool>> IsPhoneRegistered(string phone);
+    Task<ZServiceResult<EmployeeDTO>> GetByUserId(string userId);
 }
 
 public class EmployeeService(IEmployeeRepository repository, IMapper mapper, IWorker worker)
@@ -25,5 +26,13 @@ public class EmployeeService(IEmployeeRepository repository, IMapper mapper, IWo
     {
         var employee = await _repository.GetByProperty(c => c.Phone, phone);
         return ZServiceResult<bool>.Success("", employee != null);
+    }
+
+    public async Task<ZServiceResult<EmployeeDTO>> GetByUserId(string userId)
+    {
+        var employee = await _repository.GetByProperty(c => c.UserId, userId);
+        return employee != null
+            ? ZServiceResult<EmployeeDTO>.Success("", _mapper.Map<EmployeeDTO>(employee))
+            : ZServiceResult<EmployeeDTO>.Failure("Employee not found", 404);
     }
 }

@@ -11,7 +11,8 @@ public interface IUserService : IZBaseService<User, UserDTO>
     Task<ZServiceResult<UserDTO>> UserLogin(LoginRequest loginRequest);
     Task<ZServiceResult<string>> UserRegisterAsync(CustomerRegisterRequest customerRegisterRequest);
     Task<ZServiceResult<string>> EmployeeIssueAsync(EmployeeIssueRequest employeeIssueRequest);
-    Task<ZServiceResult<UserDTO>> UpdateUserAsync(UserUpdateRequest userUpdateRequest);
+
+    // Task<ZServiceResult<UserDTO>> UpdateUserAsync(UserUpdateRequest userUpdateRequest);
     Task<ZServiceResult<string>> UpdateUserAuthAsync(ChangePasswordRequest changePasswordRequest);
     Task<ZServiceResult<string>> ReIssueUserPassword(string UserId, string opRole);
 }
@@ -77,12 +78,12 @@ public class UserService : ZBaseService<User, UserDTO>, IUserService
         try
         {
             var userAuthDto = _mapper.Map<UserAuthDTO>(customerRegisterRequest.UserFormData);
-            userAuthDto.UserId = Guid.NewGuid().ToString("N");
+            userAuthDto.UserId = "user." + Guid.NewGuid().ToString("N");
             userAuthDto.Role = "Customer";
             userAuthDto.Password = BCrypt.Net.BCrypt.HashPassword(userAuthDto.Password);
 
             var customerDto = _mapper.Map<CustomerDTO>(customerRegisterRequest.CustomerFormData);
-            customerDto.CustomerId = Guid.NewGuid().ToString("N");
+            customerDto.CustomerId = "customer." + Guid.NewGuid().ToString("N");
             customerDto.UserId = userAuthDto.UserId;
 
             var user = _mapper.Map<User>(userAuthDto);
@@ -117,11 +118,11 @@ public class UserService : ZBaseService<User, UserDTO>, IUserService
         try
         {
             var user = _mapper.Map<User>(employeeIssueRequest.UserFormData);
-            user.UserId = Guid.NewGuid().ToString("N");
+            user.UserId = "user." + Guid.NewGuid().ToString("N");
             user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
 
             var employee = _mapper.Map<Employee>(employeeIssueRequest.EmployeeFormData);
-            employee.EmployeeId = Guid.NewGuid().ToString("N");
+            employee.EmployeeId = "employee." + Guid.NewGuid().ToString("N");
             employee.UserId = user.UserId;
 
             using var transaction = await _worker.BeginTransactionAsync();
@@ -175,10 +176,10 @@ public class UserService : ZBaseService<User, UserDTO>, IUserService
         }
     }
 
-    public async Task<ZServiceResult<UserDTO>> UpdateUserAsync(UserUpdateRequest userUpdateRequest)
-    {
-        return await base.UpdateAsync(_mapper.Map<UserDTO>(userUpdateRequest));
-    }
+    // public async Task<ZServiceResult<UserDTO>> UpdateUserAsync(UserUpdateRequest userUpdateRequest)
+    // {
+    //     return await base.UpdateAsync(_mapper.Map<UserDTO>(userUpdateRequest));
+    // }
 
     public async Task<ZServiceResult<string>> UpdateUserAuthAsync(
         ChangePasswordRequest changePasswordRequest
@@ -230,4 +231,6 @@ public class UserService : ZBaseService<User, UserDTO>, IUserService
             return ZServiceResult<string>.Failure(ex.Message);
         }
     }
+
+    // public async Task<ZServiceResult<string>>
 }

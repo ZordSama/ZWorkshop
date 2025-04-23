@@ -33,7 +33,7 @@ public class UserFormData : BaseUserForm
     public string? Role { get; set; }
 }
 
-public class CustomerFormData
+public class BasePersonFormData
 {
     [Required(ErrorMessage = "Full Name is required")]
     public required string FullName { get; set; }
@@ -51,6 +51,10 @@ public class CustomerFormData
 
     [Required(ErrorMessage = "Address is required")]
     public required string Address { get; set; }
+}
+
+public class CustomerFormData : BasePersonFormData
+{
     public int Status { get; set; } = 0;
 }
 

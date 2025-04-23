@@ -1,13 +1,15 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using z_workshop_server.BLL.DTOs;
+using z_workshop_server.BLL.Helpers;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-public class AuthorizeAttribute : Attribute, IAuthorizationFilter
+public class AuthorizeAttribute : Attribute, IAsyncAuthorizationFilter
 {
     public string? Roles { get; set; }
 
-    public void OnAuthorization(AuthorizationFilterContext context)
+    public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
         var allowAnonymous = context
             .ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>()
@@ -25,17 +27,13 @@ public class AuthorizeAttribute : Attribute, IAuthorizationFilter
         {
             bool inRole = Roles.Contains(user!.Role);
 
-            bool self =
-                Roles.Contains("self")
-                && user.UserId
-                    == context
-                        .HttpContext.Request.Path.Value!.Split(
-                            '/',
-                            StringSplitOptions.RemoveEmptyEntries
-                        )
-                        .Last();
-
-            if (!inRole && !self)
+            async Task<bool> isSelf()
+            {
+                if (!Roles!.Contains("self"))
+                    return false;
+                return await AuthAttrHelper.CheckSelfInAction(user.UserId, context.HttpContext);
+            }
+            if (!inRole && !await isSelf())
             {
                 context.Result = new JsonResult(new { message = "Forbidden" }) { StatusCode = 403 };
                 return;
