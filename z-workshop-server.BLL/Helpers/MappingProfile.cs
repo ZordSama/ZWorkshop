@@ -8,22 +8,33 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<User, UserDTO>().ReverseMap();
-        CreateMap<User, UserAuthDTO>().ReverseMap();
-        CreateMap<User, UserFormData>().ReverseMap();
+        void CreateCustomMap<TSource, TDestination>()
+        {
+            CreateMap<TSource, TDestination>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<TDestination, TSource>()
+                .ForAllMembers(opts =>
+                    opts.Condition((src, dest, destMember) => destMember != null)
+                );
+        }
 
-        CreateMap<Customer, CustomerDTO>().ReverseMap();
-        CreateMap<Customer, CustomerFormData>().ReverseMap();
+        CreateCustomMap<User, UserDTO>();
+        CreateCustomMap<User, UserAuthDTO>();
+        CreateCustomMap<User, UserFormData>();
 
-        CreateMap<Employee, EmployeeDTO>().ReverseMap();
-        CreateMap<Employee, EmployeeFormData>().ReverseMap();
+        CreateCustomMap<Customer, CustomerDTO>();
+        CreateCustomMap<Customer, CustomerFormData>();
+        CreateCustomMap<Customer, CustomerUpdateFormData>();
 
-        CreateMap<UserFormData, UserDTO>().ReverseMap();
-        CreateMap<UserFormData, UserAuthDTO>().ReverseMap();
-        CreateMap<UserFormData, UserUpdateRequest>().ReverseMap();
+        CreateCustomMap<Employee, EmployeeDTO>();
+        CreateCustomMap<Employee, EmployeeFormData>();
+        CreateCustomMap<Employee, EmployeeUpdateFormData>();
 
-        CreateMap<CustomerFormData, CustomerDTO>().ReverseMap();
+        CreateCustomMap<UserFormData, UserDTO>();
+        CreateCustomMap<UserFormData, UserAuthDTO>();
 
-        CreateMap<EmployeeFormData, EmployeeDTO>().ReverseMap();
+        CreateCustomMap<CustomerFormData, CustomerDTO>();
+
+        CreateCustomMap<EmployeeFormData, EmployeeDTO>();
     }
 }

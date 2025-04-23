@@ -73,15 +73,20 @@ public class CustomerRegisterRequest
     public required CustomerFormData CustomerFormData { get; set; }
 }
 
+public class CustomerUpdateFormData : BasePersonFormData
+{
+    public required string CustomerId { get; set; }
+}
+
+public class EmployeeUpdateFormData : BasePersonFormData
+{
+    public required string EmployeeId { get; set; }
+}
+
 public class EmployeeIssueRequest
 {
     public required UserFormData UserFormData { get; set; }
     public required EmployeeFormData EmployeeFormData { get; set; }
-}
-
-public class UserUpdateRequest : BaseUserForm
-{
-    public required string UserId { get; set; }
 }
 
 public class ChangePasswordRequest

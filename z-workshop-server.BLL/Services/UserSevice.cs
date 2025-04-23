@@ -11,10 +11,9 @@ public interface IUserService : IZBaseService<User, UserDTO>
     Task<ZServiceResult<UserDTO>> UserLogin(LoginRequest loginRequest);
     Task<ZServiceResult<string>> UserRegisterAsync(CustomerRegisterRequest customerRegisterRequest);
     Task<ZServiceResult<string>> EmployeeIssueAsync(EmployeeIssueRequest employeeIssueRequest);
-
-    // Task<ZServiceResult<UserDTO>> UpdateUserAsync(UserUpdateRequest userUpdateRequest);
     Task<ZServiceResult<string>> UpdateUserAuthAsync(ChangePasswordRequest changePasswordRequest);
     Task<ZServiceResult<string>> ReIssueUserPassword(string UserId, string opRole);
+    Task<ZServiceResult<string>> ChangeUserStatus(string userId, int status, string opRole);
 }
 
 public class UserService : ZBaseService<User, UserDTO>, IUserService
@@ -232,5 +231,47 @@ public class UserService : ZBaseService<User, UserDTO>, IUserService
         }
     }
 
-    // public async Task<ZServiceResult<string>>
+    public async Task<ZServiceResult<string>> ChangeUserStatus(
+        string userId,
+        int status,
+        string opRole
+    )
+    {
+        try
+        {
+            var user = await _repository.GetByIdAsync(userId);
+
+            if (user == null)
+                return ZServiceResult<string>.Failure("User not found", 404);
+
+            if (opRole == "Admin" && user.Role == "SuperAdmin")
+                return ZServiceResult<string>.Failure(
+                    "You are not authorized to perform this action!",
+                    401
+                );
+
+            var customer = await _customerRepository.GetByProperty(c => c.UserId, userId);
+            var employee = await _employeeRepository.GetByProperty(e => e.UserId, userId);
+
+            if (customer != null)
+            {
+                customer.Status = status;
+                _customerRepository.Update(customer);
+            }
+
+            if (employee != null)
+            {
+                employee.Status = status;
+                _employeeRepository.Update(employee);
+            }
+
+            await _worker.SaveChangesAsync();
+
+            return ZServiceResult<string>.Success("User status updated successfully");
+        }
+        catch (Exception ex)
+        {
+            return ZServiceResult<string>.Failure(ex.Message);
+        }
+    }
 }

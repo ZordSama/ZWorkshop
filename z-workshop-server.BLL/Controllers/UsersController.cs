@@ -1,4 +1,3 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using z_workshop_server.BLL.DTOs;
 using z_workshop_server.BLL.Services;
@@ -16,7 +15,6 @@ public class UsersController(IUserService userService) : ControllerBase
     public async Task<IActionResult> GetUsers()
     {
         var result = await _userService.GetAllAsync();
-
         return StatusCode(result.Code, result);
     }
 
@@ -25,7 +23,6 @@ public class UsersController(IUserService userService) : ControllerBase
     public async Task<IActionResult> GetUserById(string id)
     {
         var result = await _userService.GetByIdAsync(id);
-
         return StatusCode(result.Code, result);
     }
 
@@ -36,7 +33,6 @@ public class UsersController(IUserService userService) : ControllerBase
     )
     {
         var result = await _userService.UserRegisterAsync(customerRegisterRequest);
-
         return StatusCode(result.Code, result);
     }
 
@@ -47,31 +43,14 @@ public class UsersController(IUserService userService) : ControllerBase
     )
     {
         var result = await _userService.EmployeeIssueAsync(employeeIssueRequest);
-
         return StatusCode(result.Code, result);
     }
-
-    // [HttpPut("{id}")]
-    // [Authorize(Roles = "Admin, SuperAdmin, self")]
-    // public async Task<IActionResult> UpdateUser(
-    //     string id,
-    //     [FromBody] UserUpdateRequest userUpdateRequest
-    // )
-    // {
-    //     if (id != userUpdateRequest.UserId)
-    //         return BadRequest("Id does not match");
-
-    //     var result = await _userService.UpdateUserAsync(userUpdateRequest);
-
-    //     return StatusCode(result.Code, result);
-    // }
 
     [HttpDelete("{id}")]
     [Authorize(Roles = "Admin, SuperAdmin")]
     public async Task<IActionResult> DeleteUser(string id)
     {
         var result = await _userService.DeleteAsync(id);
-
         return StatusCode(result.Code, result);
     }
 
@@ -84,7 +63,6 @@ public class UsersController(IUserService userService) : ControllerBase
     {
         if (id != changePasswordRequest.UserId)
             return BadRequest("Id does not match");
-
         var result = await _userService.UpdateUserAuthAsync(changePasswordRequest);
 
         return StatusCode(result.Code, result);
@@ -96,6 +74,36 @@ public class UsersController(IUserService userService) : ControllerBase
     {
         var user = HttpContext.Items["User"] as UserDTO;
         var result = await _userService.ReIssueUserPassword(id, user!.Role);
+
+        return StatusCode(result.Code, result);
+    }
+
+    [HttpPatch("ban/{id}")]
+    [Authorize(Roles = "Admin, SuperAdmin")]
+    public async Task<IActionResult> BanUser(string id)
+    {
+        var user = HttpContext.Items["User"] as UserDTO;
+        var result = await _userService.ChangeUserStatus(id, -2, user!.Role);
+
+        return StatusCode(result.Code, result);
+    }
+
+    [HttpPatch("warning/{id}")]
+    [Authorize(Roles = "Admin, SuperAdmin")]
+    public async Task<IActionResult> WarnUser(string id)
+    {
+        var user = HttpContext.Items["User"] as UserDTO;
+        var result = await _userService.ChangeUserStatus(id, -1, user!.Role);
+
+        return StatusCode(result.Code, result);
+    }
+
+    [HttpPatch("normalize/{id}")]
+    [Authorize(Roles = "Admin, SuperAdmin")]
+    public async Task<IActionResult> NormalizeUser(string id)
+    {
+        var user = HttpContext.Items["User"] as UserDTO;
+        var result = await _userService.ChangeUserStatus(id, 0, user!.Role);
 
         return StatusCode(result.Code, result);
     }

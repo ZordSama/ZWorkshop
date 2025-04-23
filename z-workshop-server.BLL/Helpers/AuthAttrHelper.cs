@@ -21,10 +21,10 @@ public class AuthAttrHelper
         if (reqObjType == "user")
             return userId == reqObjId;
 
-        if (reqObjId == "customer")
+        if (reqObjType == "customer")
             return (await _customerService.GetByUserId(userId)).IsSuccess;
 
-        if (reqObjId == "employee")
+        if (reqObjType == "employee")
             return (await _employeeService.GetByUserId(userId))!.IsSuccess;
 
         return false;
