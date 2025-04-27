@@ -99,7 +99,7 @@ public class ChangePasswordRequest
 
 #region Products related requests DTOs
 
-public class ProductFormData
+public class ProductBaseFormData
 {
     [Required(ErrorMessage = "Product name is required")]
     [MaxLength(50, ErrorMessage = "Product name must be less than 50 characters")]
@@ -111,7 +111,16 @@ public class ProductFormData
     public required string Type { get; set; }
     public required string Genre { get; set; }
     public string? Desc { get; set; }
+}
+
+public class ProductFormData : ProductBaseFormData
+{
     public required string PublisherId { get; set; }
+}
+
+public class ProductUpdateFormData : ProductBaseFormData
+{
+    public required string ProductId { get; set; }
 }
 
 public class PublisherFormData

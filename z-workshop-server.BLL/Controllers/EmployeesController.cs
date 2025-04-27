@@ -2,15 +2,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using z_workshop_server.BLL.DTOs;
 using z_workshop_server.BLL.Services;
-using z_workshop_server.DAL.Repositories;
 
 namespace z_workshop_server.BLL.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class EmployeesController(EmployeeService employeeService) : ControllerBase
+public class EmployeesController(IEmployeeService employeeService) : ControllerBase
 {
-    protected readonly EmployeeService _employeeService = employeeService;
+    protected readonly IEmployeeService _employeeService = employeeService;
 
     [HttpGet]
     [Authorize(Roles = "SuperAdmin")]

@@ -24,9 +24,7 @@ public class FileHelper
             {
                 file.CopyTo(stream);
             }
-            return ZServiceResult<string>.Success(
-                "File saved successfully:" + dir + "/" + fileName
-            );
+            return ZServiceResult<string>.Success("File saved thành công:" + dir + "/" + fileName);
         }
         catch (Exception ex)
         {

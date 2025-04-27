@@ -43,10 +43,10 @@ public abstract class ZBaseService<TEntity, TDto> : IZBaseService<TEntity, TDto>
             var entity = await _repository.GetByIdAsync(keys);
 
             if (entity == null)
-                return ZServiceResult<TDto>.Failure($"{_entityName} not found", 404);
+                return ZServiceResult<TDto>.Failure($"{_entityName} không tồn tại", 404);
 
             return ZServiceResult<TDto>.Success(
-                "Data dispatched successfully",
+                "Truyền dữ liệu thành công",
                 _mapper.Map<TDto>(entity)
             );
         }
@@ -62,7 +62,7 @@ public abstract class ZBaseService<TEntity, TDto> : IZBaseService<TEntity, TDto>
         {
             var entities = await _repository.GetAllAsync();
             return ZServiceResult<List<TDto>>.Success(
-                "Data dispatched successfully",
+                "Truyền dữ liệu thành công",
                 _mapper.Map<List<TDto>>(entities)
             );
         }
@@ -79,14 +79,14 @@ public abstract class ZBaseService<TEntity, TDto> : IZBaseService<TEntity, TDto>
             var entity = await _repository.GetByIdAsync(keys);
 
             if (entity == null)
-                return ZServiceResult<TDto>.Failure($"{_entityName} not found", 404);
+                return ZServiceResult<TDto>.Failure($"{_entityName} không tồn tại", 404);
 
-            entity = _mapper.Map<TEntity>(dto);
+            _mapper.Map(dto, entity);
             _repository.Update(entity);
             await _worker.SaveChangesAsync();
 
             return ZServiceResult<TDto>.Success(
-                $"Updated {_entityName} {keys} successfully",
+                $"Cập nhật {_entityName} {keys} thành công",
                 _mapper.Map<TDto>(entity)
             );
         }
@@ -103,12 +103,12 @@ public abstract class ZBaseService<TEntity, TDto> : IZBaseService<TEntity, TDto>
             var entity = await _repository.GetByIdAsync(keys);
 
             if (entity == null)
-                return ZServiceResult<string>.Failure($"{_entityName} not found", 404);
+                return ZServiceResult<string>.Failure($"{_entityName} không tồn tại", 404);
 
             _repository.Delete(entity);
             await _worker.SaveChangesAsync();
 
-            return ZServiceResult<string>.Success($"Deleted {_entityName} {keys} successfully");
+            return ZServiceResult<string>.Success($"Đã xóa {_entityName} {keys}!");
         }
         catch (Exception ex)
         {

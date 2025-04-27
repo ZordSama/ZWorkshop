@@ -28,7 +28,7 @@ public class UserService : ZBaseService<User, UserDTO>, IUserService
         IMapper mapper,
         IWorker worker
     )
-        : base(userRepository, mapper, worker, "User")
+        : base(userRepository, mapper, worker, "Người dùng")
     {
         _customerRepository = customerRepository;
         _employeeRepository = employeeRepository;
@@ -41,7 +41,7 @@ public class UserService : ZBaseService<User, UserDTO>, IUserService
             var user = await _repository.GetByProperty(u => u.Username, userName);
 
             if (user == null)
-                return ZServiceResult<UserDTO>.Failure("User not found", 404);
+                return ZServiceResult<UserDTO>.Failure("Người dùng không tồn tại", 404);
 
             return ZServiceResult<UserDTO>.Success("", _mapper.Map<UserDTO>(user));
         }
@@ -59,10 +59,10 @@ public class UserService : ZBaseService<User, UserDTO>, IUserService
 
             if (user != null && BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.Password))
                 return ZServiceResult<UserDTO>.Success(
-                    "User login successfully",
+                    $"Chào mừng, {user.Username}",
                     _mapper.Map<UserDTO>(user)
                 );
-            return ZServiceResult<UserDTO>.Failure("Username or password is incorrect", 401);
+            return ZServiceResult<UserDTO>.Failure("Tài khoản hoặc mật khẩu không đúng", 401);
         }
         catch (Exception ex)
         {
@@ -96,7 +96,11 @@ public class UserService : ZBaseService<User, UserDTO>, IUserService
                 await _worker.SaveChangesAsync();
 
                 await transaction.CommitAsync();
-                return ZServiceResult<string>.Success("user created successfully", default, 201);
+                return ZServiceResult<string>.Success(
+                    "Đăng ký khách hàng thành công",
+                    default,
+                    201
+                );
             }
             catch (Exception ex)
             {
@@ -132,7 +136,11 @@ public class UserService : ZBaseService<User, UserDTO>, IUserService
                 await _worker.SaveChangesAsync();
 
                 await transaction.CommitAsync();
-                return ZServiceResult<string>.Success("user created successfully", default, 201);
+                return ZServiceResult<string>.Success(
+                    "Tạo mới người dùng thành công",
+                    default,
+                    201
+                );
             }
             catch (Exception ex)
             {
@@ -150,7 +158,7 @@ public class UserService : ZBaseService<User, UserDTO>, IUserService
     {
         var user = await _repository.GetByIdAsync(keys);
         if (user == null)
-            return ZServiceResult<string>.Failure("User not found", 404);
+            return ZServiceResult<string>.Failure("Người dùng không tồn tại", 404);
         using var transaction = await _worker.BeginTransactionAsync();
         try
         {
@@ -166,7 +174,7 @@ public class UserService : ZBaseService<User, UserDTO>, IUserService
             await _worker.SaveChangesAsync();
 
             await transaction.CommitAsync();
-            return ZServiceResult<string>.Success($"User {user.Username} deleted successfully");
+            return ZServiceResult<string>.Success($"Dã xóa người dùng {user.Username}!");
         }
         catch (Exception ex)
         {
@@ -189,15 +197,15 @@ public class UserService : ZBaseService<User, UserDTO>, IUserService
             var user = await _repository.GetByIdAsync(changePasswordRequest.UserId);
 
             if (user == null)
-                return ZServiceResult<string>.Failure("User not found", 404);
+                return ZServiceResult<string>.Failure("Người dùng không tồn tại", 404);
 
             if (!BCrypt.Net.BCrypt.Verify(changePasswordRequest.OldPassword, user.Password))
-                return ZServiceResult<string>.Failure("Old password is incorrect", 401);
+                return ZServiceResult<string>.Failure("Sai mật khẩu", 401);
 
             user.Password = BCrypt.Net.BCrypt.HashPassword(changePasswordRequest.NewPassword);
             await _worker.SaveChangesAsync();
 
-            return ZServiceResult<string>.Success("User updated successfully");
+            return ZServiceResult<string>.Success("Đã đổi mật khẩu!");
         }
         catch (Exception ex)
         {
@@ -212,18 +220,18 @@ public class UserService : ZBaseService<User, UserDTO>, IUserService
             var user = await _repository.GetByIdAsync(UserId);
 
             if (user == null)
-                return ZServiceResult<string>.Failure("User not found", 404);
+                return ZServiceResult<string>.Failure("Người dùng không tồn tại", 404);
 
             if (opRole == "Admin" && user.Role == "SuperAdmin")
                 return ZServiceResult<string>.Failure(
-                    "You are not authorized to perform this action!",
+                    "Bạn không đủ thẩm quyền để thực hiện hành động này!",
                     401
                 );
 
-            user.Password = BCrypt.Net.BCrypt.HashPassword("123456");
+            user.Password = BCrypt.Net.BCrypt.HashPassword("Zworkshop123@");
             await _worker.SaveChangesAsync();
 
-            return ZServiceResult<string>.Success("User password reset successfully");
+            return ZServiceResult<string>.Success("Đã đặt lại mật khẩu mặc định (Zworkshop123@)");
         }
         catch (Exception ex)
         {
@@ -242,11 +250,11 @@ public class UserService : ZBaseService<User, UserDTO>, IUserService
             var user = await _repository.GetByIdAsync(userId);
 
             if (user == null)
-                return ZServiceResult<string>.Failure("User not found", 404);
+                return ZServiceResult<string>.Failure("Người dùng không tồn tại", 404);
 
             if (opRole == "Admin" && user.Role == "SuperAdmin")
                 return ZServiceResult<string>.Failure(
-                    "You are not authorized to perform this action!",
+                    "Bạn không đủ thẩm quyền để thực hiện hành động này!",
                     401
                 );
 
@@ -267,7 +275,7 @@ public class UserService : ZBaseService<User, UserDTO>, IUserService
 
             await _worker.SaveChangesAsync();
 
-            return ZServiceResult<string>.Success("User status updated successfully");
+            return ZServiceResult<string>.Success("Trạng thái người dùng đã được thay đổi!");
         }
         catch (Exception ex)
         {

@@ -13,7 +13,7 @@ export function handleServerError(error: unknown) {
     'status' in error &&
     Number(error.status) === 204
   ) {
-    errMsg = 'Content not found.'
+    errMsg = 'Content không tồn tại.'
   }
 
   if (error instanceof AxiosError) {

@@ -17,7 +17,7 @@ public interface ICustomerService : IZBaseService<Customer, CustomerDTO>
 }
 
 public class CustomerService(ICustomerRepository repository, IMapper mapper, IWorker worker)
-    : ZBaseService<Customer, CustomerDTO>(repository, mapper, worker, "Customer"),
+    : ZBaseService<Customer, CustomerDTO>(repository, mapper, worker, "Khách hàng"),
         ICustomerService
 {
     public async Task<ZServiceResult<bool>> IsMailRegistered(string mail)
@@ -51,7 +51,7 @@ public class CustomerService(ICustomerRepository repository, IMapper mapper, IWo
         var customer = await _repository.GetByProperty(c => c.UserId, id);
         return customer != null
             ? ZServiceResult<CustomerDTO>.Success("", _mapper.Map<CustomerDTO>(customer))
-            : ZServiceResult<CustomerDTO>.Failure("Customer not found", 404);
+            : ZServiceResult<CustomerDTO>.Failure("Khách hàng không tồn tại", 404);
     }
 
     public async Task<ZServiceResult<CustomerDTO>> UpdateCustomer(
@@ -62,20 +62,11 @@ public class CustomerService(ICustomerRepository repository, IMapper mapper, IWo
         try
         {
             if (customerId != customerUpdateFormData.CustomerId)
-                return ZServiceResult<CustomerDTO>.Failure("Customer id mismatch", 400);
+                return ZServiceResult<CustomerDTO>.Failure("Mã khách hàng không khớp", 400);
 
-            var customer = await _repository.GetByIdAsync(customerId);
-            if (customer == null)
-                return ZServiceResult<CustomerDTO>.Failure("Customer not found", 404);
-
-            _mapper.Map(customerUpdateFormData, customer);
-            _repository.Update(customer);
-
-            await _worker.SaveChangesAsync();
-
-            return ZServiceResult<CustomerDTO>.Success(
-                $"Customer {customerId}",
-                _mapper.Map<CustomerDTO>(customer)
+            return await base.UpdateAsync(
+                _mapper.Map<CustomerDTO>(customerUpdateFormData),
+                customerId
             );
         }
         catch (Exception ex)

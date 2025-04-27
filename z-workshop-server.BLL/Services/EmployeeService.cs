@@ -10,10 +10,14 @@ public interface IEmployeeService : IZBaseService<Employee, EmployeeDTO>
     Task<ZServiceResult<bool>> IsMailRegistered(string mail);
     Task<ZServiceResult<bool>> IsPhoneRegistered(string phone);
     Task<ZServiceResult<EmployeeDTO>> GetByUserId(string userId);
+    Task<ZServiceResult<EmployeeDTO>> UpdateEmployee(
+        string employeeId,
+        EmployeeUpdateFormData employeeUpdateFormData
+    );
 }
 
 public class EmployeeService(IEmployeeRepository repository, IMapper mapper, IWorker worker)
-    : ZBaseService<Employee, EmployeeDTO>(repository, mapper, worker, "Employee"),
+    : ZBaseService<Employee, EmployeeDTO>(repository, mapper, worker, "Nhân viên"),
         IEmployeeService
 {
     public async Task<ZServiceResult<bool>> IsMailRegistered(string mail)
@@ -47,7 +51,7 @@ public class EmployeeService(IEmployeeRepository repository, IMapper mapper, IWo
         var employee = await _repository.GetByProperty(c => c.UserId, userId);
         return employee != null
             ? ZServiceResult<EmployeeDTO>.Success("", _mapper.Map<EmployeeDTO>(employee))
-            : ZServiceResult<EmployeeDTO>.Failure("Employee not found", 404);
+            : ZServiceResult<EmployeeDTO>.Failure("Nhân viên không tồn tại", 404);
     }
 
     public async Task<ZServiceResult<EmployeeDTO>> UpdateEmployee(
@@ -58,17 +62,12 @@ public class EmployeeService(IEmployeeRepository repository, IMapper mapper, IWo
         try
         {
             if (employeeId != employeeUpdateFormData.EmployeeId)
-                return ZServiceResult<EmployeeDTO>.Failure("Employee id mismatch", 400);
+                return ZServiceResult<EmployeeDTO>.Failure("Mã nhân viên không khớp", 400);
 
-            var employee = await _repository.GetByIdAsync(employeeId);
-            if (employee == null)
-                return ZServiceResult<EmployeeDTO>.Failure("Employee not found", 404);
-
-            _mapper.Map(employeeUpdateFormData, employee);
-            _repository.Update(employee);
-            await _worker.SaveChangesAsync();
-
-            return ZServiceResult<EmployeeDTO>.Success("", _mapper.Map<EmployeeDTO>(employee));
+            return await base.UpdateAsync(
+                _mapper.Map<EmployeeDTO>(employeeUpdateFormData),
+                employeeId
+            );
         }
         catch (Exception ex)
         {
