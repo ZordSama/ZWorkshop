@@ -16,6 +16,18 @@ public interface IRepository<TEntity>
         Expression<Func<TEntity, TProperty>> propertySelector,
         TProperty value
     );
+    Task<TEntity?> GetByIdWithIncludesAsync(
+        object[] keys,
+        params Expression<Func<TEntity, object>>[] includes
+    );
+    Task<TEntity?> GetByPropertyWithIncludesAsync<TProperty>(
+        Expression<Func<TEntity, TProperty>> propertySelector,
+        TProperty value,
+        params Expression<Func<TEntity, object>>[] includes
+    );
+    Task<List<TEntity>> GetAllWithIncludesAsync(
+        params Expression<Func<TEntity, object>>[] includes
+    );
     Task<List<TEntity>> GetAllAsync();
     Task AddAsync(TEntity entity);
     void Update(TEntity entity);
@@ -69,6 +81,68 @@ public class Repository<TEntity> : IRepository<TEntity>
         return await _dbSet
             .Where(e => EF.Property<TProperty>(e, propertyName)!.Equals(value))
             .ToListAsync();
+    }
+
+    public async Task<TEntity?> GetByIdWithIncludesAsync(
+        object[] keys,
+        params Expression<Func<TEntity, object>>[] includes
+    )
+    {
+        IQueryable<TEntity> query = _dbSet;
+        foreach (var include in includes)
+        {
+            query = query.Include(include);
+        }
+        // FindAsync doesn't work directly with IQueryable includes easily,
+        // so fetch based on key properties. This assumes a single key for simplicity.
+        // You might need a more robust way to handle composite keys if applicable.
+        var keyProperty = _dbContext
+            .Model.FindEntityType(typeof(TEntity))
+            ?.FindPrimaryKey()
+            ?.Properties.FirstOrDefault();
+        if (keyProperty == null || keys.Length != 1)
+        {
+            throw new NotSupportedException(
+                "GetByIdWithIncludesAsync currently supports single primary keys only or entity type not found."
+            );
+        }
+        var parameter = Expression.Parameter(typeof(TEntity), "e");
+        var propertyAccess = Expression.Property(parameter, keyProperty.Name);
+        var keyEquality = Expression.Equal(propertyAccess, Expression.Constant(keys[0]));
+        var lambda = Expression.Lambda<Func<TEntity, bool>>(keyEquality, parameter);
+
+        return await query.FirstOrDefaultAsync(lambda);
+    }
+
+    public async Task<TEntity?> GetByPropertyWithIncludesAsync<TProperty>(
+        Expression<Func<TEntity, TProperty>> propertySelector,
+        TProperty value,
+        params Expression<Func<TEntity, object>>[] includes
+    )
+    {
+        IQueryable<TEntity> query = _dbSet;
+        foreach (var include in includes)
+        {
+            query = query.Include(include);
+        }
+
+        // Combine the original property selector with the includes
+        return await query.FirstOrDefaultAsync(e =>
+            EF.Property<TProperty>(e, ((MemberExpression)propertySelector.Body).Member.Name)!
+                .Equals(value)
+        );
+    }
+
+    public async Task<List<TEntity>> GetAllWithIncludesAsync(
+        params Expression<Func<TEntity, object>>[] includes
+    )
+    {
+        IQueryable<TEntity> query = _dbSet;
+        foreach (var include in includes)
+        {
+            query = query.Include(include);
+        }
+        return await query.ToListAsync();
     }
 
     public async Task<List<TEntity>> GetAllAsync()

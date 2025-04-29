@@ -35,6 +35,12 @@ public class CustomerDTO : PersonDTO
     public string? Payments { get; set; }
 }
 
+public class CustomerWithUserDTO
+{
+    public CustomerDTO CustomerDto { get; set; } = null!;
+    public UserDTO UserDto { get; set; } = null!;
+}
+
 public class EmployeeDTO : PersonDTO
 {
     public string EmployeeId { get; set; } = null!;

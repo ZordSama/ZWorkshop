@@ -59,7 +59,8 @@ const queryClient = new QueryClient({
         if (error.response?.status === 401) {
           toast({
             variant: 'destructive',
-            title: 'Session expired!',
+            title: 'Phiên đăng nhập không hợp lệ!',
+            content: error.response.data?.message || 'Vui lòng đăng nhập lại',
           })
           useAuthStore.getState().auth.reset()
           const redirect = `${router.history.location.href}`
@@ -68,7 +69,8 @@ const queryClient = new QueryClient({
         if (error.response?.status === 500) {
           toast({
             variant: 'destructive',
-            title: 'Internal Server Error!',
+            title: 'Lỗi hệ thống!',
+            content: error.response.data?.message || 'Vui lòng thử lại sau',
           })
           router.navigate({ to: '/500' })
         }

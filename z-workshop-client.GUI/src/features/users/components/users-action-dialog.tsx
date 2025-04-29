@@ -130,7 +130,7 @@ export function UsersActionDialog({
     ? `http://localhost:5062/api/Users/${currentRow.userId}`
     : 'http://localhost:5062/api/Users'
   const method = isEdit ? 'put' : 'post'
-  if (isEdit) console.log
+  // if (isEdit) console.
   const onSubmit = async (values: UserForm) => {
     try {
       await axios({

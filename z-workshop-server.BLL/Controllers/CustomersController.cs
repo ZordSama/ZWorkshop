@@ -19,6 +19,15 @@ namespace z_workshop_server.BLL.Controllers
             return StatusCode(result.Code, result);
         }
 
+        [HttpGet("getAll")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetCustomersWithUser()
+        {
+            var result = await _customerService.GetAllWithUser();
+
+            return StatusCode(result.Code, result);
+        }
+
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin, SuperAdmin, self")]
         public async Task<IActionResult> GetCustomer(string id)

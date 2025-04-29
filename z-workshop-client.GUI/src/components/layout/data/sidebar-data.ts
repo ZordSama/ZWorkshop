@@ -19,6 +19,7 @@ import {
   IconUserCog,
   IconUserOff,
   IconUsers,
+  IconUserShield,
 } from '@tabler/icons-react'
 import { AudioWaveform, Command, GalleryVerticalEnd } from 'lucide-react'
 import { type SidebarData } from '../types'
@@ -54,33 +55,45 @@ export const sidebarData: SidebarData = {
           title: 'Cửa hàng',
           url: '/',
           icon: IconDeviceGamepad2,
+          authGroup: [],
         },
         {
           title: 'Tổng quát',
           url: '/dashboard',
           icon: IconLayoutDashboard,
+          authGroup: [],
         },
         {
           title: 'Hàng chờ',
           url: '/tasks',
           icon: IconChecklist,
+
+          authGroup: [],
         },
         {
           title: 'Quản lý sản phẩm',
           url: '/apps',
           icon: IconPackages,
+          authGroup: [],
         },
         {
           title: 'Nhóm nội bộ',
           url: '/chats',
           badge: '3',
           icon: IconMessages,
+          authGroup: [],
         },
         {
-          title: 'Quản lý người dùng',
+          title: 'Quản lý nhân viên',
+          url: '/users',
+          icon: IconUserShield,
+          authGroup: [],
+        },
+        {
+          title: 'Quản lý khách hàng',
           url: '/users',
           icon: IconUsers,
-        },
+        }
       ],
     },
     {
@@ -183,6 +196,7 @@ export const sidebarData: SidebarData = {
           title: 'Help Center',
           url: '/help-center',
           icon: IconHelp,
+          authGroup: [],
         },
       ],
     },
