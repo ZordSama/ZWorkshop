@@ -15,6 +15,7 @@ public class AuthAttrHelper
 
         var user = await _userService!.GetByIdAsync(userId);
 
+        // Console.WriteLine("Objtype:" + reqObjType);
         if (user == null)
             return false;
 
@@ -22,10 +23,15 @@ public class AuthAttrHelper
             return userId == reqObjId;
 
         if (reqObjType == "customer")
-            return (await _customerService.GetByUserId(userId)).IsSuccess;
-
+        {
+            var customer = (await _customerService.GetByUserId(userId)).Data;
+            return customer != null && customer.CustomerId == reqObjId;
+        }
         if (reqObjType == "employee")
-            return (await _employeeService.GetByUserId(userId))!.IsSuccess;
+        {
+            var employee = (await _employeeService.GetByUserId(userId)).Data;
+            return employee != null && employee.EmployeeId == reqObjId;
+        }
 
         return false;
     }

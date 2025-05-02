@@ -44,6 +44,13 @@ public class CustomerWithUserDTO
 public class EmployeeDTO : PersonDTO
 {
     public string EmployeeId { get; set; } = null!;
+    public DateTime HiredDate { get; set; }
+}
+
+public class EmployeeWithUserDTO
+{
+    public EmployeeDTO EmployeeDto { get; set; } = null!;
+    public UserDTO UserDto { get; set; } = null!;
 }
 
 public class ProductToPurchaseDTO
@@ -68,4 +75,14 @@ public class ProductDTO
     public string PublisherId { get; set; } = null!;
 }
 
+public class PublisherDTO
+{
+    public string Id { get; set; } = null!;
+    public string Name { get; set; } = null!;
+    public string Avt { get; set; } = null!;
+    public int Status { get; set; }
+    public string Email { get; set; } = null!;
+    public DateTime? CreatedAt { get; set; }
+    public DateTime? LastUpdate { get; set; }
+}
 #endregion

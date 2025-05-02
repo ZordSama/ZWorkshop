@@ -10,6 +10,8 @@ public interface IEmployeeService : IZBaseService<Employee, EmployeeDTO>
     Task<ZServiceResult<bool>> IsMailRegistered(string mail);
     Task<ZServiceResult<bool>> IsPhoneRegistered(string phone);
     Task<ZServiceResult<EmployeeDTO>> GetByUserId(string userId);
+    Task<ZServiceResult<EmployeeWithUserDTO>> GetWithUserById(string userId);
+    Task<ZServiceResult<List<EmployeeWithUserDTO>>> GetAllWithUser();
     Task<ZServiceResult<EmployeeDTO>> UpdateEmployee(
         string employeeId,
         EmployeeUpdateFormData employeeUpdateFormData
@@ -52,6 +54,45 @@ public class EmployeeService(IEmployeeRepository repository, IMapper mapper, IWo
         return employee != null
             ? ZServiceResult<EmployeeDTO>.Success("", _mapper.Map<EmployeeDTO>(employee))
             : ZServiceResult<EmployeeDTO>.Failure("Nhân viên không tồn tại", 404);
+    }
+
+    public async Task<ZServiceResult<EmployeeWithUserDTO>> GetWithUserById(string userId)
+    {
+        try
+        {
+            var employee = await _repository.GetByIdWithIncludesAsync([userId], e => e.User);
+            if (employee == null)
+                return ZServiceResult<EmployeeWithUserDTO>.Failure("Nhân viên không tồn tại", 404);
+            EmployeeWithUserDTO employeeWithUserDTO = new();
+            employeeWithUserDTO.EmployeeDto = _mapper.Map<EmployeeDTO>(employee);
+            employeeWithUserDTO.UserDto = _mapper.Map<UserDTO>(employee.User);
+            return ZServiceResult<EmployeeWithUserDTO>.Success("", employeeWithUserDTO);
+        }
+        catch (System.Exception ex)
+        {
+            return ZServiceResult<EmployeeWithUserDTO>.Failure(ex.Message);
+        }
+    }
+
+    public async Task<ZServiceResult<List<EmployeeWithUserDTO>>> GetAllWithUser()
+    {
+        try
+        {
+            var employees = await _repository.GetAllWithIncludesAsync(e => e.User);
+            List<EmployeeWithUserDTO> employeeWithUserDTOs = new();
+            foreach (var employee in employees)
+            {
+                EmployeeWithUserDTO employeeWithUserDTO = new();
+                employeeWithUserDTO.EmployeeDto = _mapper.Map<EmployeeDTO>(employee);
+                employeeWithUserDTO.UserDto = _mapper.Map<UserDTO>(employee.User);
+                employeeWithUserDTOs.Add(employeeWithUserDTO);
+            }
+            return ZServiceResult<List<EmployeeWithUserDTO>>.Success("", employeeWithUserDTOs);
+        }
+        catch (Exception ex)
+        {
+            return ZServiceResult<List<EmployeeWithUserDTO>>.Failure(ex.Message);
+        }
     }
 
     public async Task<ZServiceResult<EmployeeDTO>> UpdateEmployee(

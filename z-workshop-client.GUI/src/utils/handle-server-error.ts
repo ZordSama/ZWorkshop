@@ -3,22 +3,16 @@ import { toast } from '@/hooks/use-toast'
 
 export function handleServerError(error: unknown) {
   // eslint-disable-next-line no-console
-  console.log(error)
+  // console.log(error)
 
   let errMsg = 'Something went wrong!'
 
-  if (
-    error &&
-    typeof error === 'object' &&
-    'status' in error &&
-    Number(error.status) === 204
-  ) {
-    errMsg = 'Content không tồn tại.'
-  }
-
+  // toast({ variant: 'destructive', title: 'WHAT THE FUCK????' })
   if (error instanceof AxiosError) {
-    errMsg = error.response?.data.title
+    errMsg = error.response?.data.message || errMsg
+    // errMsg = error.response?
   }
 
-  toast({ variant: 'destructive', title: errMsg })
+  console.log(errMsg)
+  toast({ variant: 'destructive', title: 'Lỗi', description: errMsg })
 }

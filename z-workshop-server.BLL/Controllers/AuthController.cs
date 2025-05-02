@@ -29,6 +29,6 @@ public class AuthController(IJwtServices jwt, IUserService userService) : Contro
         var result = await _userService.UserLogin(request);
         if (result.IsSuccess)
             return Ok(new { token = _jwt.GenerateToken(result.Data!) });
-        return Unauthorized(result.Message);
+        return StatusCode(result.Code, result);
     }
 }

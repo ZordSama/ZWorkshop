@@ -34,10 +34,15 @@ public class MappingProfile : Profile
         CreateCustomMap<Product, ProductFormData>();
         CreateCustomMap<Product, ProductUpdateFormData>();
 
+        CreateCustomMap<Publisher, PublisherDTO>();
+        CreateCustomMap<Publisher, PublisherFormData>();
+        CreateCustomMap<Publisher, PublisherUpdateFormData>();
+
         CreateCustomMap<UserFormData, UserDTO>();
         CreateCustomMap<UserFormData, UserAuthDTO>();
 
         CreateCustomMap<CustomerFormData, CustomerDTO>();
+        CreateCustomMap<CustomerUpdateFormData, CustomerDTO>();
 
         CreateCustomMap<EmployeeFormData, EmployeeDTO>();
         CreateCustomMap<EmployeeUpdateFormData, EmployeeDTO>();

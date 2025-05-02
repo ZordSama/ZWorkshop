@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using z_workshop_server.DAL.Models;
 
 namespace z_workshop_server.DAL.Data;
@@ -30,14 +32,14 @@ public partial class AppDbContext : DbContext
     {
         modelBuilder.Entity<Comment>(entity =>
         {
-            entity.Property(e => e.CommentId).HasMaxLength(32);
+            entity.Property(e => e.CommentId).HasMaxLength(64);
             entity
                 .Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-            entity.Property(e => e.ProductId).HasMaxLength(32);
-            entity.Property(e => e.ResponseOf).HasMaxLength(32);
-            entity.Property(e => e.UserId).HasMaxLength(32);
+            entity.Property(e => e.ProductId).HasMaxLength(64);
+            entity.Property(e => e.ResponseOf).HasMaxLength(64);
+            entity.Property(e => e.UserId).HasMaxLength(64);
 
             entity
                 .HasOne(d => d.Product)
@@ -71,7 +73,7 @@ public partial class AppDbContext : DbContext
 
             entity.HasIndex(e => e.UserId, "UK_Customer_UserId").IsUnique();
 
-            entity.Property(e => e.CustomerId).HasMaxLength(32);
+            entity.Property(e => e.CustomerId).HasMaxLength(64);
             entity
                 .Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -80,7 +82,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Fullname).HasMaxLength(255);
             entity.Property(e => e.LastUpdate).HasColumnType("datetime");
             entity.Property(e => e.Phone).HasMaxLength(255);
-            entity.Property(e => e.UserId).HasMaxLength(32);
+            entity.Property(e => e.UserId).HasMaxLength(64);
 
             entity
                 .HasOne(d => d.User)
@@ -110,8 +112,8 @@ public partial class AppDbContext : DbContext
                     {
                         j.HasKey("Customer", "Product");
                         j.ToTable("Cart");
-                        j.IndexerProperty<string>("Customer").HasMaxLength(32);
-                        j.IndexerProperty<string>("Product").HasMaxLength(32);
+                        j.IndexerProperty<string>("Customer").HasMaxLength(64);
+                        j.IndexerProperty<string>("Product").HasMaxLength(64);
                     }
                 );
 
@@ -136,8 +138,8 @@ public partial class AppDbContext : DbContext
                     {
                         j.HasKey("CustomerId", "ProductId");
                         j.ToTable("Library");
-                        j.IndexerProperty<string>("CustomerId").HasMaxLength(32);
-                        j.IndexerProperty<string>("ProductId").HasMaxLength(32);
+                        j.IndexerProperty<string>("CustomerId").HasMaxLength(64);
+                        j.IndexerProperty<string>("ProductId").HasMaxLength(64);
                     }
                 );
         });
@@ -152,7 +154,7 @@ public partial class AppDbContext : DbContext
 
             entity.HasIndex(e => e.UserId, "UK_Employee_UserId").IsUnique();
 
-            entity.Property(e => e.EmployeeId).HasMaxLength(32);
+            entity.Property(e => e.EmployeeId).HasMaxLength(64);
             entity
                 .Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -164,7 +166,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Phone).HasMaxLength(255);
             entity.Property(e => e.Role).HasMaxLength(255);
             entity.Property(e => e.TerminationDate).HasColumnType("datetime");
-            entity.Property(e => e.UserId).HasMaxLength(32);
+            entity.Property(e => e.UserId).HasMaxLength(64);
 
             entity
                 .HasOne(d => d.User)
@@ -178,8 +180,8 @@ public partial class AppDbContext : DbContext
         {
             entity.ToTable("Product");
 
-            entity.Property(e => e.ProductId).HasMaxLength(32);
-            entity.Property(e => e.ApprovedBy).HasMaxLength(32);
+            entity.Property(e => e.ProductId).HasMaxLength(64);
+            entity.Property(e => e.ApprovedBy).HasMaxLength(64);
             entity
                 .Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -188,7 +190,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.LastUpdate).HasColumnType("datetime");
             entity.Property(e => e.Name).HasMaxLength(255);
             entity.Property(e => e.Price).HasColumnType("decimal(19, 4)");
-            entity.Property(e => e.PublisherId).HasMaxLength(32);
+            entity.Property(e => e.PublisherId).HasMaxLength(64);
             entity.Property(e => e.Type).HasMaxLength(255);
 
             entity
@@ -214,7 +216,7 @@ public partial class AppDbContext : DbContext
 
             entity.HasIndex(e => e.Name, "UK_Publisher_Name").IsUnique();
 
-            entity.Property(e => e.Id).HasMaxLength(32);
+            entity.Property(e => e.PublisherId).HasMaxLength(64);
             entity
                 .Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -228,15 +230,14 @@ public partial class AppDbContext : DbContext
         {
             entity.ToTable("Purchase");
 
-            entity.Property(e => e.Id).HasMaxLength(32);
+            entity.Property(e => e.PurchaseId).HasMaxLength(64);
             entity.Property(e => e.CloseAt).HasColumnType("datetime");
             entity
                 .Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-            entity.Property(e => e.CustomerId).HasMaxLength(32);
+            entity.Property(e => e.CustomerId).HasMaxLength(64);
             entity.Property(e => e.LastUpdate).HasColumnType("datetime");
-            entity.Property(e => e.TotalValue).HasColumnType("decimal(19, 4)");
 
             entity
                 .HasOne(d => d.Customer)
@@ -252,8 +253,8 @@ public partial class AppDbContext : DbContext
 
             entity.ToTable("PurchaseDetail");
 
-            entity.Property(e => e.PurchaseId).HasMaxLength(32);
-            entity.Property(e => e.ProductId).HasMaxLength(32);
+            entity.Property(e => e.PurchaseId).HasMaxLength(64);
+            entity.Property(e => e.ProductId).HasMaxLength(64);
             entity.Property(e => e.UnitPrice).HasColumnType("decimal(19, 4)");
 
             entity
@@ -277,7 +278,7 @@ public partial class AppDbContext : DbContext
 
             entity.HasIndex(e => e.Username, "idx_User_Username");
 
-            entity.Property(e => e.UserId).HasMaxLength(32);
+            entity.Property(e => e.UserId).HasMaxLength(64);
             entity.Property(e => e.Avatar).HasMaxLength(255);
             entity
                 .Property(e => e.CreatedAt)
@@ -285,7 +286,7 @@ public partial class AppDbContext : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.LastUpdate).HasColumnType("datetime");
             entity.Property(e => e.Password).HasMaxLength(255);
-            entity.Property(e => e.Role).HasMaxLength(32);
+            entity.Property(e => e.Role).HasMaxLength(64);
             entity.Property(e => e.Username).HasMaxLength(255);
         });
 

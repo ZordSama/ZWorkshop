@@ -1,8 +1,10 @@
 import * as React from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { DayPicker } from 'react-day-picker'
+import { format, getMonth, getYear } from 'date-fns'
 import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
+
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>
 
@@ -10,17 +12,87 @@ function Calendar({
   className,
   classNames,
   showOutsideDays = true,
+  locale,
   ...props
 }: CalendarProps) {
+  const [month, setMonth] = React.useState<Date>(props.defaultMonth || new Date())
+  
+  const handleYearChange = (year: number) => {
+    const newDate = new Date(month)
+    newDate.setFullYear(year)
+    setMonth(newDate)
+  }
+  
+  const handleMonthChange = (monthIndex: number) => {
+    const newDate = new Date(month)
+    newDate.setMonth(monthIndex)
+    setMonth(newDate)
+  }
+  
+  const years = React.useMemo(() => {
+    const currentYear = new Date().getFullYear()
+    return Array.from({ length: 125 }, (_, i) => currentYear - 124 + i).reverse()
+  }, [])
+  
+  const getLocalizedMonths = () => {
+    if (locale) {
+      return Array.from({ length: 12 }, (_, i) => {
+        const date = new Date(2000, i, 1)
+        return format(date, 'LLL', { locale })
+      });
+    } else {
+      return Array.from({ length: 12 }, (_, i) => {
+        return new Date(2000, i, 1).toLocaleString('en-US', { month: 'narrow' });
+      });
+    }
+  }
+  
+  const months = getLocalizedMonths();
+
+  const CustomCaption = ({ displayMonth }: { displayMonth: Date }) => {
+    const monthIndex = getMonth(displayMonth)
+    const year = getYear(displayMonth)
+    
+    return (
+      <div className="flex justify-center space-x-2">
+        <select 
+          className="text-sm px-2 py-1 rounded-md border bg-background"
+          value={monthIndex}
+          onChange={(e) => handleMonthChange(Number(e.target.value))}
+        >
+          {months.map((month, idx) => (
+            <option key={idx} value={idx}>
+              {month}
+            </option>
+          ))}
+        </select>
+        
+        <select 
+          className="text-sm px-2 py-1 rounded-md border bg-background"
+          value={year}
+          onChange={(e) => handleYearChange(Number(e.target.value))}
+        >
+          {years.map((y) => (
+            <option key={y} value={y}>
+              {y}
+            </option>
+          ))}
+        </select>
+      </div>
+    )
+  }
+
   return (
     <DayPicker
+      month={month}
+      onMonthChange={setMonth}
       showOutsideDays={showOutsideDays}
       className={cn('p-3', className)}
       classNames={{
         months: 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0',
         month: 'space-y-4',
         caption: 'flex justify-center pt-1 relative items-center',
-        caption_label: 'text-sm font-medium',
+        caption_label: 'hidden', // Hide default caption label
         nav: 'space-x-1 flex items-center',
         nav_button: cn(
           buttonVariants({ variant: 'outline' }),
@@ -57,8 +129,9 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        IconLeft: () => <ChevronLeft className='h-4 w-4' />,
-        IconRight: () => <ChevronRight className='h-4 w-4' />,
+        IconLeft: () => <ChevronLeft className="h-4 w-4" />,
+        IconRight: () => <ChevronRight className="h-4 w-4" />,
+        Caption: ({ displayMonth }) => <CustomCaption displayMonth={displayMonth} />
       }}
       {...props}
     />

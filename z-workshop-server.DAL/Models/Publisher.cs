@@ -1,12 +1,15 @@
-﻿namespace z_workshop_server.DAL.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace z_workshop_server.DAL.Models;
 
 public partial class Publisher
 {
-    public string Id { get; set; } = null!;
+    public string PublisherId { get; set; } = null!;
 
     public string Name { get; set; } = null!;
 
-    public string Avt { get; set; } = null!;
+    public string? Avt { get; set; }
 
     public int Status { get; set; }
 

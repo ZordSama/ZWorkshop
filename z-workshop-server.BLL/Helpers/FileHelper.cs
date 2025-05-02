@@ -1,18 +1,26 @@
+using System.Threading.Tasks;
 using z_workshop_server.BLL.DTOs;
 
 namespace z_workshop_server.BLL.Helpers;
 
 public class FileHelper
 {
-    public static string _basePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/file");
+    protected static readonly string _basePath = Path.Combine(
+        Directory.GetCurrentDirectory(),
+        "wwwroot/file"
+    );
 
-    public static ZServiceResult<string> SaveFile(IFormFile file, string dir, string fileName)
+    public static async Task<ZServiceResult<string>> SaveFile(
+        IFormFile file,
+        string dir,
+        string fileName
+    )
     {
         try
         {
             if (file == null || file.Length == 0)
             {
-                return ZServiceResult<string>.Failure("No file are saved");
+                return ZServiceResult<string>.Failure("No file are saved", 400);
             }
             var path = Path.Combine(_basePath, dir);
             if (!Directory.Exists(path))
@@ -22,9 +30,12 @@ public class FileHelper
             var filePath = Path.Combine(path, fileName);
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
-                file.CopyTo(stream);
+                await file.CopyToAsync(stream);
             }
-            return ZServiceResult<string>.Success("File saved thành công:" + dir + "/" + fileName);
+            return ZServiceResult<string>.Success(
+                "File saved thành công:" + dir + "/" + fileName,
+                Path.Combine(dir, fileName).Replace("\\", "/")
+            );
         }
         catch (Exception ex)
         {

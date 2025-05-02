@@ -6,6 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { callTypes } from '../data/data'
 import { Customer } from '../data/schema'
 import { DataTableColumnHeader } from './data-table-column-header'
+import { DataTableRowActions } from './data-table-row-actions'
 
 export const columns: ColumnDef<Customer>[] = [
   {
@@ -37,18 +38,20 @@ export const columns: ColumnDef<Customer>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
+    enableGlobalFilter: false,
   },
   {
-    id: 'fullName',
-    accessorFn: (row) => row.customerDto.fullName,
+    id: 'fullname',
+    accessorFn: (row) => row.customerDto.fullname,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Họ tên' />
     ),
     cell: ({ row }) => {
-      return <span>{row.getValue('fullName')}</span>
+      return <span>{row.getValue('fullname')}</span>
     },
     enableSorting: true,
     enableHiding: false,
+    enableGlobalFilter: true,
   },
   {
     id: 'dob',
@@ -58,10 +61,11 @@ export const columns: ColumnDef<Customer>[] = [
     ),
     cell: ({ row }) => {
       var dob: Date = row.getValue('dob')
-      return <span>{format(new Date(dob), 'dd/mm/yyyy')}</span>
+      return <span>{format(new Date(dob), 'dd/MM/yyyy')}</span>
     },
     enableSorting: true,
     enableHiding: true,
+    enableGlobalFilter: true,
   },
   {
     id: 'address',
@@ -74,6 +78,7 @@ export const columns: ColumnDef<Customer>[] = [
     },
     enableSorting: false,
     enableHiding: true,
+    enableGlobalFilter: true,
   },
   {
     id: 'username',
@@ -86,6 +91,7 @@ export const columns: ColumnDef<Customer>[] = [
     },
     enableSorting: false,
     enableHiding: false,
+    enableGlobalFilter: true,
   },
   {
     id: 'phone',
@@ -98,6 +104,7 @@ export const columns: ColumnDef<Customer>[] = [
     },
     enableSorting: false,
     enableHiding: true,
+    enableGlobalFilter: true,
   },
   {
     id: 'email',
@@ -110,6 +117,7 @@ export const columns: ColumnDef<Customer>[] = [
     },
     enableSorting: false,
     enableHiding: true,
+    enableGlobalFilter: true,
   },
   {
     id: 'status',
@@ -130,8 +138,15 @@ export const columns: ColumnDef<Customer>[] = [
     },
     enableSorting: true,
     enableHiding: true,
+    enableGlobalFilter: false,
   },
   {
-    id: 'actions'
-  }
+    id: 'actions',
+    // header: ({ column }) =>
+    //   <DataTableColumnHeader column={column} title='Hành động' />,
+    cell: DataTableRowActions,
+    enableHiding: false,
+    enableSorting: false,
+    enableGlobalFilter: false,
+  },
 ]

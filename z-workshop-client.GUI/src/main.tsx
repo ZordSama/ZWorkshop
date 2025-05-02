@@ -55,7 +55,10 @@ const queryClient = new QueryClient({
   },
   queryCache: new QueryCache({
     onError: (error) => {
+      console.log(typeof error)
+
       if (error instanceof AxiosError) {
+        console.log('yo')
         if (error.response?.status === 401) {
           toast({
             variant: 'destructive',

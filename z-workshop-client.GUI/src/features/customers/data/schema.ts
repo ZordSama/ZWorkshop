@@ -13,13 +13,12 @@ const userDtoSchema = z.object({
 })
 
 const customerDtoSchema = z.object({
-  customerid: z.string(),
-  fullName: z.string(),
+  customerId: z.string(),
+  fullname: z.string(),
   dob: z.coerce.date(),
   address: z.string(),
   phone: z.string(),
   email: z.string(),
-  // status: z.number(),
   status: z.number().transform((numStatus, ctx): CustomerStatus => {
     switch (numStatus) {
       case 0:
@@ -33,10 +32,7 @@ const customerDtoSchema = z.object({
         ctx.addIssue({
           code: z.ZodIssueCode.custom, // Use 'custom' for non-standard errors
           message: `Invalid status number: ${numStatus}. Expected 0, -1, or -2.`,
-          // fatal: true, // Optional: make this error stop further parsing
         })
-        // Zod requires a return value even if an issue is added.
-        // z.NEVER tells Zod this path is invalid and parsing should fail.
         return z.NEVER
     }
   }),

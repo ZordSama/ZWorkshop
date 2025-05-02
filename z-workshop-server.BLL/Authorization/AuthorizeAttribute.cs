@@ -32,6 +32,8 @@ public class AuthorizeAttribute : Attribute, IAsyncAuthorizationFilter
                     return false;
                 return await AuthAttrHelper.CheckSelfInAction(user.UserId, context.HttpContext);
             }
+
+            Console.WriteLine("Is Self: " + await isSelf());
             if (!inRole && !await isSelf())
             {
                 context.Result = new JsonResult(new { message = "Forbidden" }) { StatusCode = 403 };

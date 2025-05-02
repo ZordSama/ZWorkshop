@@ -29,4 +29,4 @@ export function handleQueryError(err: any) {
   }
 }
 
-export const SERVER_API_URL = 'http://localhost:5045/api/'
+export const SERVER_API_URL = 'http://localhost:5045/api'

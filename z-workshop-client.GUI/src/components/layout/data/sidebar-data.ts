@@ -26,9 +26,10 @@ import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {
   user: {
-    name: 'Zord',
-    email: 'quangsang.red@gmail.com',
-    avatar: '/avatars/shadcn.jpg',
+    userId: '',
+    username: 'Khách',
+    role: 'Guest',
+    avatar: undefined,
   },
   teams: [
     {
@@ -85,15 +86,15 @@ export const sidebarData: SidebarData = {
         },
         {
           title: 'Quản lý nhân viên',
-          url: '/users',
+          url: '/employees',
           icon: IconUserShield,
           authGroup: [],
         },
         {
           title: 'Quản lý khách hàng',
-          url: '/users',
+          url: '/customers',
           icon: IconUsers,
-        }
+        },
       ],
     },
     {

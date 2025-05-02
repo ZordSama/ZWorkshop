@@ -5,3 +5,9 @@ export interface IAppCapsule {
   fallback: string
   price: number
 }
+export interface AuthUser {
+  userId: string
+  username: string
+  role: string
+  avatar: string | undefined
+}

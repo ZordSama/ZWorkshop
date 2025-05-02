@@ -19,6 +19,14 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
         return StatusCode(result.Code, result);
     }
 
+    [HttpGet("getAll")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAllWithUser()
+    {
+        var result = await _employeeService.GetAllWithUser();
+        return StatusCode(result.Code, result);
+    }
+
     [HttpGet("{id}")]
     [Authorize(Roles = "SuperAdmin, self")]
     public async Task<IActionResult> Get(string id)

@@ -1,4 +1,6 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { userService } from '@/services/user'
+import { useAuthStore } from '@/stores/authStore'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
@@ -13,6 +15,15 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 export function ProfileDropdown() {
+  const user = useAuthStore.getState().auth.user
+  const navigate = useNavigate()
+  const handleLogout = () => {
+    userService.logout()
+    navigate({
+      to: '/sign-in',
+    })
+    console.log('Logging out...')
+  }
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
@@ -26,9 +37,11 @@ export function ProfileDropdown() {
       <DropdownMenuContent className='w-56' align='end' forceMount>
         <DropdownMenuLabel className='font-normal'>
           <div className='flex flex-col space-y-1'>
-            <p className='text-sm font-medium leading-none'>Zord</p>
+            <p className='text-sm font-medium leading-none'>
+              {user?.username || 'Guest'}
+            </p>
             <p className='text-xs leading-none text-muted-foreground'>
-              quangsang.red@gmail.com
+              {user?.role || 'Guest'}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -36,27 +49,14 @@ export function ProfileDropdown() {
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
             <Link to='/settings'>
-              Profile
+              Hồ sơ
               <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link to='/settings'>
-              Billing
-              <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link to='/settings'>
-              Settings
-              <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem>New Team</DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          Log out
+        <DropdownMenuItem onSelect={handleLogout}>
+          Đăng xuất
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>

@@ -1,10 +1,15 @@
 import { HTMLAttributes, useState } from 'react'
 import { z } from 'zod'
+import { AxiosError } from 'axios'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { IconBrandFacebook, IconBrandGithub } from '@tabler/icons-react'
+import { userService } from '@/services/user'
+import { useAuthStore } from '@/stores/authStore'
 import { cn } from '@/lib/utils'
+import { handleServerError } from '@/utils/handle-server-error'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -20,38 +25,57 @@ import { PasswordInput } from '@/components/password-input'
 type UserAuthFormProps = HTMLAttributes<HTMLDivElement>
 
 const formSchema = z.object({
-  email: z
-    .string()
-    .min(1, { message: 'Please enter your email' })
-    .email({ message: 'Invalid email address' }),
+  username: z.string().min(1, { message: 'Hãy nhập tên đăng nhập' }),
   password: z
     .string()
     .min(1, {
-      message: 'Please enter your password',
+      message: 'Hãy nhập mật khẩu',
     })
-    .min(7, {
-      message: 'Password must be at least 7 characters long',
+    .min(6, {
+      message: 'Độ dài mật khẩu tối thiểu là 6',
     }),
 })
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
+  const { setUser } = useAuthStore.getState().auth
+
+  const userLogin = useMutation({
+    mutationFn: userService.login,
+    onSuccess: async () => {
+      const user = await userService.me()
+      setUser(user)
+      navigate({
+        to: '/',
+      })
+    },
+    onError: (error) => {
+      console.log(error)
+      handleServerError(error)
+      if (error instanceof AxiosError) {
+        error.response?.status === 401 &&
+          form.setError('password', {
+            message: 'Sai tên đăng nhập hoặc mật khẩu',
+          })
+        form.setError('username', { message: '' })
+      }
+    },
+    onSettled: () => {
+      setIsLoading(false)
+    },
+  })
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
+      username: '',
       password: '',
     },
   })
 
   function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
-    // eslint-disable-next-line no-console
-    console.log(data)
-    navigate({
-      to: '/',
-    })
+    userLogin.mutate(data)
   }
 
   return (
@@ -61,10 +85,10 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           <div className='grid gap-2'>
             <FormField
               control={form.control}
-              name='email'
+              name='username'
               render={({ field }) => (
                 <FormItem className='space-y-1'>
-                  <FormLabel>Gà</FormLabel>
+                  <FormLabel>Tên đăng nhập</FormLabel>
                   <FormControl>
                     <Input placeholder='name@example.com' {...field} />
                   </FormControl>
@@ -78,12 +102,12 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               render={({ field }) => (
                 <FormItem className='space-y-1'>
                   <div className='flex items-center justify-between'>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>Mật khẩu</FormLabel>
                     <Link
                       to='/forgot-password'
                       className='text-sm font-medium text-muted-foreground hover:opacity-75'
                     >
-                      Forgot password?
+                      Quên mật khẩu?
                     </Link>
                   </div>
                   <FormControl>
@@ -94,7 +118,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               )}
             />
             <Button className='mt-2' disabled={isLoading}>
-              Login
+              Đăng nhập
             </Button>
 
             <div className='relative my-2'>
@@ -103,7 +127,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               </div>
               <div className='relative flex justify-center text-xs uppercase'>
                 <span className='bg-background px-2 text-muted-foreground'>
-                  Or continue with
+                  Hoặc sử dụng
                 </span>
               </div>
             </div>

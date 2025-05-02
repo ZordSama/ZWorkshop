@@ -7,29 +7,29 @@ export default function SignIn() {
     <AuthLayout>
       <Card className='p-6'>
         <div className='flex flex-col space-y-2 text-left'>
-          <h1 className='text-2xl font-semibold tracking-tight'>Login</h1>
+          <h1 className='text-2xl font-semibold tracking-tight'>Đăng nhập</h1>
           <p className='text-sm text-muted-foreground'>
-            Enter your email and password below <br />
-            to log into your account
+            Hãy sử dụng tên đăng nhập và mật khẩu của bạn<br />
+            để đăng nhập vào hệ thống
           </p>
         </div>
         <UserAuthForm />
         <p className='mt-4 px-8 text-center text-sm text-muted-foreground'>
-          By clicking login, you agree to our{' '}
+          Bằng cách đăng nhập vào hệ thống, bạn đã đồng ý với{' '}
           <a
             href='/terms'
             className='underline underline-offset-4 hover:text-primary'
           >
-            Terms of Service
+            Điều khoản dịch vụ
           </a>{' '}
-          and{' '}
+          và{' '}
           <a
             href='/privacy'
             className='underline underline-offset-4 hover:text-primary'
           >
-            Privacy Policy
+            Chính sách bảo mật
           </a>
-          .
+          của chúng tôi (Zord).
         </p>
       </Card>
     </AuthLayout>

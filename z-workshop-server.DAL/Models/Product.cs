@@ -1,4 +1,7 @@
-﻿namespace z_workshop_server.DAL.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace z_workshop_server.DAL.Models;
 
 public partial class Product
 {

@@ -162,11 +162,11 @@ public class UserService : ZBaseService<User, UserDTO>, IUserService
         using var transaction = await _worker.BeginTransactionAsync();
         try
         {
-            var employee = await _employeeRepository.GetByProperty(e => e.EmployeeId, keys[0]);
+            var employee = await _employeeRepository.GetByProperty(e => e.UserId, keys[0]);
             if (employee != null)
                 _employeeRepository.Delete(employee);
 
-            var customer = await _customerRepository.GetByProperty(c => c.CustomerId, keys[0]);
+            var customer = await _customerRepository.GetByProperty(c => c.UserId, keys[0]);
             if (customer != null)
                 _customerRepository.Delete(customer);
 

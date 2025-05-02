@@ -111,6 +111,7 @@ public class ProductBaseFormData
     public required string Type { get; set; }
     public required string Genre { get; set; }
     public string? Desc { get; set; }
+    public IFormFile? Thumbnail { get; set; }
 }
 
 public class ProductFormData : ProductBaseFormData
@@ -129,6 +130,11 @@ public class PublisherFormData
     public string Avt { get; set; } = null!;
     public int Status { get; set; }
     public string Email { get; set; } = null!;
+}
+
+public class PublisherUpdateFormData : ProductBaseFormData
+{
+    public required string PublisherId { get; set; }
 }
 #endregion
 
