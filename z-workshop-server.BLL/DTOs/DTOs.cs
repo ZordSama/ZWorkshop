@@ -73,11 +73,18 @@ public class ProductDTO
     public DateTime? LastUpdate { get; set; }
     public string ApprovedBy { get; set; } = null!;
     public string PublisherId { get; set; } = null!;
+    public string PublisherName { get; set; } = null!;
+}
+
+public class ProductDescJsonDTO
+{
+    public string? Description { get; set; }
+    public string? Thumbnail { get; set; }
 }
 
 public class PublisherDTO
 {
-    public string Id { get; set; } = null!;
+    public string PublisherId { get; set; } = null!;
     public string Name { get; set; } = null!;
     public string Avt { get; set; } = null!;
     public int Status { get; set; }

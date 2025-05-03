@@ -76,6 +76,10 @@ export const sidebarData: SidebarData = {
           url: '/apps',
           icon: IconPackages,
           authGroup: [],
+        },{
+          title: 'Quản lý nhà phát hành',
+          url: '/publishers',
+          icon: IconPalette,
         },
         {
           title: 'Nhóm nội bộ',
@@ -95,6 +99,7 @@ export const sidebarData: SidebarData = {
           url: '/customers',
           icon: IconUsers,
         },
+
       ],
     },
     {

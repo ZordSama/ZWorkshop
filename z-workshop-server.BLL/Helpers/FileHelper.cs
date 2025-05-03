@@ -7,7 +7,7 @@ public class FileHelper
 {
     protected static readonly string _basePath = Path.Combine(
         Directory.GetCurrentDirectory(),
-        "wwwroot/file"
+        "wwwroot/files"
     );
 
     public static async Task<ZServiceResult<string>> SaveFile(
@@ -27,14 +27,18 @@ public class FileHelper
             {
                 Directory.CreateDirectory(path);
             }
-            var filePath = Path.Combine(path, fileName);
+
+            string fileExtension = Path.GetExtension(file.FileName);
+            string fileNameWithExtension = fileName + fileExtension;
+
+            var filePath = Path.Combine(path, fileNameWithExtension);
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
             }
             return ZServiceResult<string>.Success(
-                "File saved thành công:" + dir + "/" + fileName,
-                Path.Combine(dir, fileName).Replace("\\", "/")
+                "File saved thành công:" + dir + "/" + fileNameWithExtension,
+                Path.Combine(dir, fileNameWithExtension).Replace("\\", "/")
             );
         }
         catch (Exception ex)

@@ -126,9 +126,9 @@ public class ProductUpdateFormData : ProductBaseFormData
 
 public class PublisherFormData
 {
-    public string Name { get; set; } = null!;
-    public string Avt { get; set; } = null!;
-    public int Status { get; set; }
+    public required string Name { get; set; }
+    public IFormFile? FileAvt { get; set; }
+    public int Status { get; set; } = 0;
     public string Email { get; set; } = null!;
 }
 

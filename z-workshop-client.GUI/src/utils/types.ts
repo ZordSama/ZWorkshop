@@ -11,3 +11,8 @@ export interface AuthUser {
   role: string
   avatar: string | undefined
 }
+
+export interface UpdateWithFileMutationProps {
+  id: string
+  data: FormData
+}

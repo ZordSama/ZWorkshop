@@ -52,6 +52,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IPublisherService, PublisherService>();
 
 builder.Services.AddCors();
 builder.Services.AddControllers();

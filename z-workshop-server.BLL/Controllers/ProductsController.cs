@@ -18,6 +18,14 @@ public class ProductsController(IProductService productService) : ControllerBase
         return StatusCode(result.Code, result);
     }
 
+    [HttpGet("getAll")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetProductsWithPublisherName()
+    {
+        var result = await _productService.GetAllWithPublisherNameAsync();
+        return StatusCode(result.Code, result);
+    }
+
     [HttpGet("{id}")]
     [AllowAnonymous]
     public async Task<IActionResult> GetProduct(string id)
@@ -32,6 +40,15 @@ public class ProductsController(IProductService productService) : ControllerBase
     {
         var user = HttpContext.Items["User"] as UserDTO;
         var result = await _productService.CreateProduct(productFormData, user!.UserId);
+        return StatusCode(result.Code, result);
+    }
+
+    [HttpPut("{id}")]
+    [Authorize(Roles = "Admin, SuperAdmin")]
+    public async Task<IActionResult> UpdateProduct(string id, ProductUpdateFormData productFormData)
+    {
+        var user = HttpContext.Items["User"] as UserDTO;
+        var result = await _productService.UpdateProduct(id, productFormData, user!.UserId);
         return StatusCode(result.Code, result);
     }
 }

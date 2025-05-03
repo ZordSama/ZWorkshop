@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using z_workshop_server.BLL.DTOs;
+using z_workshop_server.BLL.Helpers;
 using z_workshop_server.DAL.Models;
 using z_workshop_server.DAL.Repositories;
 
@@ -22,7 +23,21 @@ public class PublisherService(IPublisherRepository repository, IMapper mapper, I
         try
         {
             var publisher = _mapper.Map<Publisher>(publisherFormData);
-            publisher.PublisherId = Guid.NewGuid().ToString("N");
+            publisher.PublisherId = $"publisher.{Guid.NewGuid():N}";
+
+            var avtUrl = "";
+            if (publisherFormData.FileAvt != null && publisherFormData.FileAvt.Length > 0)
+            {
+                var fileSaveResult = await FileHelper.SaveFile(
+                    publisherFormData.FileAvt,
+                    "publisher_thumbnails",
+                    publisher.PublisherId
+                );
+                if (!fileSaveResult.IsSuccess)
+                    return fileSaveResult;
+                avtUrl = fileSaveResult.Data;
+            }
+            publisher.Avt = avtUrl;
             await _repository.AddAsync(publisher);
             await _worker.SaveChangesAsync();
 
