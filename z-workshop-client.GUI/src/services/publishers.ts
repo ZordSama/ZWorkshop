@@ -27,7 +27,18 @@ export const publisherService = {
       .then((res) => res.data)
     return res
   },
-  updatePublisher: async (data: any) => {},
+  updatePublisher: async (id: string, data: FormData) => {
+    const authToken = useAuthStore.getState().auth.accessToken
+    const res = await axios
+      .put(`${SERVER_API_URL}/Publishers/${id}`, data, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      .then((res) => res.data)
+    return res
+  },
   deletePublisher: async (id: string) => {
     const authToken = useAuthStore.getState().auth.accessToken
     const res = await axios

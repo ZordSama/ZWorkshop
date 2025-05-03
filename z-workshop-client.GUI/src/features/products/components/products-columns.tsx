@@ -54,7 +54,7 @@ export const columns: ColumnDef<Product>[] = [
     enableGlobalFilter: true,
   },
   {
-    id: '',
+    id: 'email',
     accessorFn: (row) => row.price,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Email' />

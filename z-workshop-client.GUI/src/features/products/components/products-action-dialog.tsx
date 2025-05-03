@@ -1,12 +1,24 @@
+import { useEffect, useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
+import { CaretSortIcon } from '@radix-ui/react-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { productService } from '@/services/products'
+import { publisherService } from '@/services/publishers'
+import { CheckIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { UpdateWithFileMutationProps } from '@/utils/types'
 import { toast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command'
 import {
   Dialog,
   DialogContent,
@@ -25,35 +37,46 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import {
+  Publisher,
+  publisherListSchema,
+} from '@/features/publishers/data/schema'
 import { Product } from '../data/schema'
 
 const productSchema = z
   .object({
     productId: z.string().optional(),
     name: z.string().min(1).max(100),
-    email: z.string().email(),
-    status: z
-      .union([z.literal('active'), z.literal('warning'), z.literal('banned')])
-      .optional(),
-    fileAvt: z
+    price: z.coerce.number().min(0, 'Không được nhỏ hơn 0'),
+    type: z.union([z.literal('Game'), z.literal('App')]),
+    genre: z.string(),
+    description: z.string(),
+    thumbnail: z
       .any()
       .refine((file) => file instanceof File || file instanceof Blob, {
-        message: 'Logo is required',
+        message: 'Ảnh sản phẩm không hợp lệ',
       })
       .optional(),
+    publisherId: z.string().optional(),
     isEdit: z.boolean(),
   })
   .superRefine((data, ctx) => {
     if (data.isEdit && !data.productId) {
       ctx.addIssue({
         code: 'custom',
-        message: 'productId is required',
+        message: 'productId là bắt buộc',
         path: ['productId'],
       })
     }
@@ -68,18 +91,14 @@ interface Props {
   onSuccess: () => void
 }
 
-const statusOptions = [
+const typeOption = [
   {
-    label: 'Active',
-    value: 'active',
+    label: 'Game',
+    value: 'Game',
   },
   {
-    label: 'Warning',
-    value: 'warning',
-  },
-  {
-    label: 'Banned',
-    value: 'banned',
+    label: 'App',
+    value: 'App',
   },
 ]
 
@@ -89,6 +108,31 @@ export function ProductsActionDialog({
   onOpenChange,
   onSuccess,
 }: Props) {
+  const { data: rawPublishersData } = useQuery({
+    queryKey: ['testPublishers'],
+    queryFn: publisherService.getPublishers,
+    // refetchOnWindowFocus: false,
+    // refetchOnMount: false,
+    // staleTime: Infinity,
+    // enabled: true,
+  })
+
+  const [publishers, setPublishers] = useState<Publisher[]>([])
+
+  useEffect(() => {
+    if (rawPublishersData) {
+      const parsedData = publisherListSchema.safeParse(rawPublishersData.data)
+      if (parsedData.success) {
+        setPublishers(parsedData.data)
+        console.log('Parsed publisher data:', parsedData.data)
+      } else {
+        console.error('Error parsing publisher data:', parsedData.error)
+        // Optionally set an empty array or handle the error in another way
+        setPublishers([])
+      }
+    }
+  }, [rawPublishersData])
+
   const isEdit = !!currentRow
   // console.log('isedit? ', isEdit)
   const form = useForm<ProductForm>({
@@ -96,14 +140,15 @@ export function ProductsActionDialog({
     defaultValues: isEdit
       ? {
           ...currentRow,
-          fileAvt: undefined,
+          thumbnail: undefined,
+          description: JSON.parse(currentRow.desc).Description || '',
           isEdit,
         }
       : {
           name: '',
-          email: '',
-          status: 'active',
-          fileAvt: undefined,
+          price: 0,
+          type: 'Game',
+          thumbnail: undefined,
           isEdit,
         },
   })
@@ -139,20 +184,14 @@ export function ProductsActionDialog({
     const formData = new FormData()
     if (isEdit && data.productId) formData.append('ProductId', data.productId)
     formData.append('Name', data.name)
-    formData.append('Email', data.email)
-    switch (data.status) {
-      case 'banned':
-        formData.append('Status', '-2')
-        break
-      case 'warning':
-        formData.append('Status', '-1')
-        break
-      default:
-        formData.append('Status', '0')
-        break
-    }
+    formData.append('Type', data.type)
+    formData.append('Price', data.price.toString())
+    formData.append('Genre', data.genre)
+    formData.append('Desc', data.description)
+    if (!isEdit && data.publisherId)
+      formData.append('PublisherId', data.publisherId)
 
-    if (data.fileAvt) formData.append('FileAvt', data.fileAvt)
+    if (data.thumbnail) formData.append('Thumbnail', data.thumbnail)
     if (isEdit && data.productId) {
       productUpdateMutation.mutate({ id: data.productId, data: formData })
     } else {
@@ -172,7 +211,7 @@ export function ProductsActionDialog({
       <DialogContent className='sm:max-w-lg'>
         <DialogHeader className='text-left'>
           <DialogTitle>
-            {isEdit ? 'Chỉnh sửa nhà phát hành' : 'Thêm mới nhà phát hành'}
+            {isEdit ? 'Chỉnh sửa sản phẩm' : 'Thêm mới sản phẩm'}
           </DialogTitle>
           <DialogDescription>
             {isEdit ? 'Cập nhật thông tin. ' : 'Thêm mới thông tin. '}
@@ -197,11 +236,11 @@ export function ProductsActionDialog({
                 render={({ field }) => (
                   <FormItem className='grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0'>
                     <FormLabel className='col-span-2 text-right'>
-                      Tên NPH
+                      Tên Game/App
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='Nguyễn Văn A'
+                        placeholder='Assasin Creed'
                         className='col-span-4'
                         autoComplete='off'
                         {...field}
@@ -211,56 +250,75 @@ export function ProductsActionDialog({
                   </FormItem>
                 )}
               />
-              {!isEdit && (
-                <FormField
-                  control={form.control}
-                  name='status'
-                  render={({ field }) => (
-                    <FormItem className='grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0'>
-                      <FormLabel className='col-span-2 text-right'>
-                        Trạng thái
-                      </FormLabel>
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
+              <FormField
+                control={form.control}
+                name='price'
+                render={({ field }) => (
+                  <FormItem className='grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0'>
+                    <FormLabel className='col-span-2 text-right'>
+                      Giá bán
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className='col-span-4'
+                        autoComplete='off'
+                        type='number'
+                        step='1'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className='col-span-4 col-start-3' />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='type'
+                render={({ field }) => (
+                  <FormItem className='grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0'>
+                    <FormLabel className='col-span-2 text-right'>
+                      Loại sản phẩm
+                    </FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <SelectTrigger
+                          className={cn(
+                            'col-span-4 pl-3 text-left font-normal',
+                            !field.value && 'text-muted-foreground'
+                          )}
                         >
-                          <SelectTrigger
-                            className={cn(
-                              'col-span-4 pl-3 text-left font-normal',
-                              !field.value && 'text-muted-foreground'
-                            )}
-                          >
-                            <SelectValue placeholder='Chọn vai trò' />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {statusOptions.map((role) => (
-                              <SelectItem key={role.value} value={role.value}>
-                                {role.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage className='col-span-4 col-start-3' />
-                    </FormItem>
-                  )}
-                />
-              )}
-
+                          <SelectValue placeholder='Chọn vai trò' />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {typeOption.map((role) => (
+                            <SelectItem key={role.value} value={role.value}>
+                              {role.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage className='col-span-4 col-start-3' />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
-                name='email'
+                name='genre'
                 render={({ field }) => (
                   <FormItem className='grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0'>
                     <FormLabel className='col-span-2 text-right'>
-                      Email
+                      Thể loại
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='example@gmail.com'
+                        placeholder='Action, Adventure'
                         className='col-span-4'
                         autoComplete='off'
+                        step='1'
                         {...field}
                       />
                     </FormControl>
@@ -270,11 +328,11 @@ export function ProductsActionDialog({
               />
               <FormField
                 control={form.control}
-                name='fileAvt'
+                name='thumbnail'
                 render={({ field }) => (
                   <FormItem className='grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0'>
                     <FormLabel className='col-span-2 text-right'>
-                      Ảnh logo NPH
+                      Ảnh sản phẩm
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -285,6 +343,97 @@ export function ProductsActionDialog({
                       />
                     </FormControl>
                     <FormMessage className='col-span-4 col-start-3' />
+                  </FormItem>
+                )}
+              />
+              {!isEdit && (
+                <FormField
+                  control={form.control}
+                  name='publisherId'
+                  render={({ field }) => (
+                    <FormItem className='grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0'>
+                      <FormLabel className='col-span-2 text-right'>
+                        Nhà phát hành
+                      </FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant='outline'
+                              role='combobox'
+                              className={cn(
+                                'col-span-4 text-start',
+                                !field.value && 'text-muted-foreground'
+                              )}
+                            >
+                              {field.value
+                                ? publishers.find(
+                                    (publisher) =>
+                                      publisher.publisherId === field.value
+                                  )?.name
+                                : 'Chọn nhà phát hành'}
+                              <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className='p-0'>
+                          <Command>
+                            <CommandInput placeholder='Tìm...' />
+                            <CommandEmpty>
+                              Không tìm thấy... <br />
+                              <i className='text-muted-foreground'>
+                                nếu cần đăng ký cho NPH mới hãy chuyển sang tab
+                                quản lý NPH.
+                              </i>
+                            </CommandEmpty>
+                            <CommandGroup>
+                              <CommandList>
+                                {publishers.map((publisher) => (
+                                  <CommandItem
+                                    value={publisher.name}
+                                    key={publisher.publisherId}
+                                    onSelect={() => {
+                                      form.setValue(
+                                        'publisherId',
+                                        publisher.publisherId
+                                      )
+                                    }}
+                                  >
+                                    <CheckIcon
+                                      className={cn(
+                                        'mr-2 h-4 w-4',
+                                        publisher.publisherId === field.value
+                                          ? 'opacity-100'
+                                          : 'opacity-0'
+                                      )}
+                                    />
+                                    {publisher.name}
+                                  </CommandItem>
+                                ))}
+                              </CommandList>
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+              <FormField
+                control={form.control}
+                name='description'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Chi tiết về sản phẩm</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder='Mô tả chi tiết về sản phẩm này'
+                        className='resize-none'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />

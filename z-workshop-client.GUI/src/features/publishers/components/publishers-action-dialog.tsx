@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { publisherService } from '@/services/publishers'
 import { cn } from '@/lib/utils'
+import { UpdateWithFileMutationProps } from '@/utils/types'
 import { toast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import {
@@ -107,14 +108,26 @@ export function PublishersActionDialog({
         },
   })
 
-  const publisherMutation = useMutation({
-    mutationFn: isEdit
-      ? publisherService.updatePublisher
-      : publisherService.createPublisher,
+  const publisherCreateMutation = useMutation({
+    mutationFn: publisherService.createPublisher,
     onSuccess: (data) => {
       toast({
         variant: 'default',
         title: isEdit ? 'Cập nhật thành công' : 'Thêm mới thành công',
+        description: data.message,
+      })
+      onSuccess()
+      onOpenChange(false)
+    },
+  })
+
+  const publisherUpdateMutation = useMutation({
+    mutationFn: ({ id, data }: UpdateWithFileMutationProps) =>
+      publisherService.updatePublisher(id, data),
+    onSuccess: (data) => {
+      toast({
+        variant: 'default',
+        title: 'Cập nhật thành công',
         description: data.message,
       })
       onSuccess()
@@ -142,8 +155,12 @@ export function PublishersActionDialog({
     }
 
     if (data.fileAvt) formData.append('FileAvt', data.fileAvt)
-
-    publisherMutation.mutate(formData)
+      
+    if (isEdit && data.publisherId) {
+      publisherUpdateMutation.mutate({ id: data.publisherId, data: formData })
+    } else {
+      publisherCreateMutation.mutate(formData)
+    }
   }
 
   //   const
@@ -187,7 +204,7 @@ export function PublishersActionDialog({
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='Nguyễn Văn A'
+                        placeholder='UbiSuck inc'
                         className='col-span-4'
                         autoComplete='off'
                         {...field}

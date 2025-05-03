@@ -57,10 +57,10 @@ export default function Publishers() {
         <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
           <div>
             <h2 className='text-2xl font-bold tracking-tight'>
-              Quản lý nhân viên
+              Quản lý nhà phát hành
             </h2>
             <p className='text-muted-foreground'>
-              Thông tin của nhân viên được hiển thị ở bảng dưới.
+              Thông tin của nhà phát hành được hiển thị ở bảng dưới.
             </p>
           </div>
           <PublishersPrimaryButtons />

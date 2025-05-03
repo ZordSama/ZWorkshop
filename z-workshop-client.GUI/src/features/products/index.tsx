@@ -1,50 +1,46 @@
 import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { publisherService } from '@/services/publishers'
+import { productService } from '@/services/products'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { columns } from './components/publishers-columns'
-import { PublishersDialogs } from './components/publishers-dialogs'
-import { PublishersPrimaryButtons } from './components/publishers-primary-buttons'
-import { PublishersTable } from './components/publishers-table'
-import PublishersProvider from './context/publishers-context'
-import { Publisher, publisherListSchema } from './data/schema'
+import { columns } from './components/products-columns'
+import { ProductsDialogs } from './components/products-dialogs'
+import { ProductsPrimaryButtons } from './components/products-primary-buttons'
+import { ProductsTable } from './components/products-table'
+import ProductsProvider from './context/products-context'
+import { Product, productListSchema } from './data/schema'
 
-export default function Publishers() {
+export default function Products() {
   const {
-    data: rawPublishersData,
+    data: rawProductsData,
     refetch,
     isLoading,
   } = useQuery({
-    queryKey: ['testPublishers'],
-    queryFn: publisherService.getPublishers,
-    // refetchOnWindowFocus: false,
-    // refetchOnMount: false,
-    // staleTime: Infinity,
-    // enabled: true,
+    queryKey: ['testProducts'],
+    queryFn: productService.getProducts,
   })
 
-  const [publishers, setPublishers] = useState<Publisher[]>([])
+  const [products, setProducts] = useState<Product[]>([])
 
   useEffect(() => {
-    if (rawPublishersData) {
-      const parsedData = publisherListSchema.safeParse(rawPublishersData.data)
+    if (rawProductsData) {
+      const parsedData = productListSchema.safeParse(rawProductsData.data)
       if (parsedData.success) {
-        setPublishers(parsedData.data)
-        console.log('Parsed publisher data:', parsedData.data)
+        setProducts(parsedData.data)
+        console.log('Parsed product data:', parsedData.data)
       } else {
-        console.error('Error parsing publisher data:', parsedData.error)
+        console.error('Error parsing product data:', parsedData.error)
         // Optionally set an empty array or handle the error in another way
-        setPublishers([])
+        setProducts([])
       }
     }
-  }, [rawPublishersData])
+  }, [rawProductsData])
 
   return (
-    <PublishersProvider>
+    <ProductsProvider>
       <Header fixed>
         <Search />
         <div className='ml-auto flex items-center space-x-4'>
@@ -63,18 +59,18 @@ export default function Publishers() {
               Thông tin của nhân viên được hiển thị ở bảng dưới.
             </p>
           </div>
-          <PublishersPrimaryButtons />
+          <ProductsPrimaryButtons />
         </div>
         <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0'>
-          <PublishersTable
-            data={publishers}
+          <ProductsTable
+            data={products}
             columns={columns}
             isLoading={isLoading}
           />
         </div>
       </Main>
 
-      <PublishersDialogs onSuccess={refetch} />
-    </PublishersProvider>
+      <ProductsDialogs onSuccess={refetch} />
+    </ProductsProvider>
   )
 }

@@ -1,9 +1,8 @@
 import { z } from 'zod'
 
 const productTypeSchema = z.union([
-  z.literal('game'),
-  z.literal('app'),
-  z.literal('banned'),
+  z.literal('Game'),
+  z.literal('App'),
 ])
 export type ProductType = z.infer<typeof productTypeSchema>
 

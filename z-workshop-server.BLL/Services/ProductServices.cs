@@ -18,10 +18,15 @@ public interface IProductService : IZBaseService<Product, ProductDTO>
     );
 }
 
-public class ProductService(IProductRepository repository, IMapper mapper, IWorker worker)
-    : ZBaseService<Product, ProductDTO>(repository, mapper, worker, "Sản phẩm"),
-        IProductService
+public class ProductService(
+    IProductRepository repository,
+    IMapper mapper,
+    IWorker worker,
+    IEmployeeRepository employeeRepository
+) : ZBaseService<Product, ProductDTO>(repository, mapper, worker, "Sản phẩm"), IProductService
 {
+    protected readonly IEmployeeRepository _employeeRepository = employeeRepository;
+
     public async Task<ZServiceResult<List<ProductDTO>>> GetAllWithPublisherNameAsync()
     {
         try
@@ -54,14 +59,19 @@ public class ProductService(IProductRepository repository, IMapper mapper, IWork
     {
         try
         {
+            var employee = await _employeeRepository.GetByProperty(e => e.UserId, opId);
+            if (employee == null)
+                return ZServiceResult<string>.Failure("Người dùng không có thẩm quyền", 401);
+
             var product = _mapper.Map<Product>(productFormData);
+
             product.ProductId = "product." + Guid.NewGuid().ToString("N");
             var fileUrl = "";
             if (productFormData.Thumbnail != null)
             {
                 var fileSaveResult = await FileHelper.SaveFile(
                     productFormData.Thumbnail,
-                    "product_thumnails",
+                    "product_thumbnails",
                     product.ProductId
                 );
                 if (!fileSaveResult.IsSuccess)
@@ -74,7 +84,7 @@ public class ProductService(IProductRepository repository, IMapper mapper, IWork
                 new ProductDescJsonDTO { Description = product.Desc, Thumbnail = fileUrl }
             );
 
-            product.ApprovedBy = opId;
+            product.ApprovedBy = employee.EmployeeId;
 
             await _repository.AddAsync(product);
             await _worker.SaveChangesAsync();
@@ -97,24 +107,28 @@ public class ProductService(IProductRepository repository, IMapper mapper, IWork
             return ZServiceResult<string>.Failure("ID sản phẩm không khớp", 400);
         try
         {
+            var employee = await _employeeRepository.GetByProperty(e => e.UserId, opId);
+            if (employee == null)
+                return ZServiceResult<string>.Failure("Người dùng không có thẩm quyền", 401);
+
             var product = await _repository.GetByIdAsync(productUpdateFormData.ProductId);
 
             if (product == null)
                 return ZServiceResult<string>.Failure("Không tìm thấy sản phẩm");
 
-            _mapper.Map(productUpdateFormData, product);
-
             var productDesc = new ProductDescJsonDTO { Description = null, Thumbnail = null };
             if (product.Desc != null)
+            {
                 productDesc = Newtonsoft.Json.JsonConvert.DeserializeObject<ProductDescJsonDTO>(
                     product.Desc
                 );
+            }
 
             if (productUpdateFormData.Thumbnail != null)
             {
                 var fileSaveResult = await FileHelper.SaveFile(
                     productUpdateFormData.Thumbnail,
-                    "product_thumnails",
+                    "product_thumbnails",
                     product.ProductId
                 );
                 if (!fileSaveResult.IsSuccess)
@@ -125,8 +139,9 @@ public class ProductService(IProductRepository repository, IMapper mapper, IWork
             if (productUpdateFormData.Desc != null)
                 productDesc!.Description = productUpdateFormData.Desc;
 
+            _mapper.Map(productUpdateFormData, product);
             product.Desc = Newtonsoft.Json.JsonConvert.SerializeObject(productDesc);
-            product.ApprovedBy = opId;
+            product.ApprovedBy = employee.EmployeeId;
 
             _repository.Update(product);
             await _worker.SaveChangesAsync();
