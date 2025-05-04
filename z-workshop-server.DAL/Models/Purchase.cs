@@ -19,5 +19,6 @@ public partial class Purchase
 
     public virtual Customer Customer { get; set; } = null!;
 
-    public virtual ICollection<PurchaseDetail> PurchaseDetails { get; set; } = new List<PurchaseDetail>();
+    public virtual ICollection<PurchaseDetail> PurchaseDetails { get; set; } =
+        new List<PurchaseDetail>();
 }

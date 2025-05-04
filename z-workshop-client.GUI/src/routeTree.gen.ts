@@ -21,6 +21,7 @@ import { Route as auth500Import } from './routes/(auth)/500'
 
 // Create Virtual Routes
 
+const errorsComingsoonLazyImport = createFileRoute('/(errors)/comingsoon')()
 const errors503LazyImport = createFileRoute('/(errors)/503')()
 const errors500LazyImport = createFileRoute('/(errors)/500')()
 const errors404LazyImport = createFileRoute('/(errors)/404')()
@@ -42,6 +43,9 @@ const AuthenticatedTasksIndexLazyImport = createFileRoute(
 )()
 const AuthenticatedSettingsIndexLazyImport = createFileRoute(
   '/_authenticated/settings/',
+)()
+const AuthenticatedPurchaseHistoryIndexLazyImport = createFileRoute(
+  '/_authenticated/purchase-history/',
 )()
 const AuthenticatedPublishersIndexLazyImport = createFileRoute(
   '/_authenticated/publishers/',
@@ -92,6 +96,14 @@ const AuthenticatedIndexRoute = AuthenticatedIndexImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+
+const errorsComingsoonLazyRoute = errorsComingsoonLazyImport
+  .update({
+    id: '/(errors)/comingsoon',
+    path: '/comingsoon',
+    getParentRoute: () => rootRoute,
+  } as any)
+  .lazy(() => import('./routes/(errors)/comingsoon.lazy').then((d) => d.Route))
 
 const errors503LazyRoute = errors503LazyImport
   .update({
@@ -211,6 +223,17 @@ const AuthenticatedSettingsIndexLazyRoute =
     getParentRoute: () => AuthenticatedSettingsRouteLazyRoute,
   } as any).lazy(() =>
     import('./routes/_authenticated/settings/index.lazy').then((d) => d.Route),
+  )
+
+const AuthenticatedPurchaseHistoryIndexLazyRoute =
+  AuthenticatedPurchaseHistoryIndexLazyImport.update({
+    id: '/purchase-history/',
+    path: '/purchase-history/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/purchase-history/index.lazy').then(
+      (d) => d.Route,
+    ),
   )
 
 const AuthenticatedPublishersIndexLazyRoute =
@@ -429,6 +452,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof errors503LazyImport
       parentRoute: typeof rootRoute
     }
+    '/(errors)/comingsoon': {
+      id: '/(errors)/comingsoon'
+      path: '/comingsoon'
+      fullPath: '/comingsoon'
+      preLoaderRoute: typeof errorsComingsoonLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/_authenticated/': {
       id: '/_authenticated/'
       path: '/'
@@ -520,6 +550,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPublishersIndexLazyImport
       parentRoute: typeof AuthenticatedRouteImport
     }
+    '/_authenticated/purchase-history/': {
+      id: '/_authenticated/purchase-history/'
+      path: '/purchase-history'
+      fullPath: '/purchase-history'
+      preLoaderRoute: typeof AuthenticatedPurchaseHistoryIndexLazyImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
     '/_authenticated/settings/': {
       id: '/_authenticated/settings/'
       path: '/'
@@ -583,6 +620,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLibraryIndexLazyRoute: typeof AuthenticatedLibraryIndexLazyRoute
   AuthenticatedProductsIndexLazyRoute: typeof AuthenticatedProductsIndexLazyRoute
   AuthenticatedPublishersIndexLazyRoute: typeof AuthenticatedPublishersIndexLazyRoute
+  AuthenticatedPurchaseHistoryIndexLazyRoute: typeof AuthenticatedPurchaseHistoryIndexLazyRoute
   AuthenticatedTasksIndexLazyRoute: typeof AuthenticatedTasksIndexLazyRoute
   AuthenticatedUsersIndexLazyRoute: typeof AuthenticatedUsersIndexLazyRoute
 }
@@ -599,6 +637,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLibraryIndexLazyRoute: AuthenticatedLibraryIndexLazyRoute,
   AuthenticatedProductsIndexLazyRoute: AuthenticatedProductsIndexLazyRoute,
   AuthenticatedPublishersIndexLazyRoute: AuthenticatedPublishersIndexLazyRoute,
+  AuthenticatedPurchaseHistoryIndexLazyRoute:
+    AuthenticatedPurchaseHistoryIndexLazyRoute,
   AuthenticatedTasksIndexLazyRoute: AuthenticatedTasksIndexLazyRoute,
   AuthenticatedUsersIndexLazyRoute: AuthenticatedUsersIndexLazyRoute,
 }
@@ -619,6 +659,7 @@ export interface FileRoutesByFullPath {
   '/403': typeof errors403LazyRoute
   '/404': typeof errors404LazyRoute
   '/503': typeof errors503LazyRoute
+  '/comingsoon': typeof errorsComingsoonLazyRoute
   '/': typeof AuthenticatedIndexRoute
   '/settings/account': typeof AuthenticatedSettingsAccountLazyRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceLazyRoute
@@ -632,6 +673,7 @@ export interface FileRoutesByFullPath {
   '/library': typeof AuthenticatedLibraryIndexLazyRoute
   '/products': typeof AuthenticatedProductsIndexLazyRoute
   '/publishers': typeof AuthenticatedPublishersIndexLazyRoute
+  '/purchase-history': typeof AuthenticatedPurchaseHistoryIndexLazyRoute
   '/settings/': typeof AuthenticatedSettingsIndexLazyRoute
   '/tasks': typeof AuthenticatedTasksIndexLazyRoute
   '/users': typeof AuthenticatedUsersIndexLazyRoute
@@ -648,6 +690,7 @@ export interface FileRoutesByTo {
   '/403': typeof errors403LazyRoute
   '/404': typeof errors404LazyRoute
   '/503': typeof errors503LazyRoute
+  '/comingsoon': typeof errorsComingsoonLazyRoute
   '/': typeof AuthenticatedIndexRoute
   '/settings/account': typeof AuthenticatedSettingsAccountLazyRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceLazyRoute
@@ -661,6 +704,7 @@ export interface FileRoutesByTo {
   '/library': typeof AuthenticatedLibraryIndexLazyRoute
   '/products': typeof AuthenticatedProductsIndexLazyRoute
   '/publishers': typeof AuthenticatedPublishersIndexLazyRoute
+  '/purchase-history': typeof AuthenticatedPurchaseHistoryIndexLazyRoute
   '/settings': typeof AuthenticatedSettingsIndexLazyRoute
   '/tasks': typeof AuthenticatedTasksIndexLazyRoute
   '/users': typeof AuthenticatedUsersIndexLazyRoute
@@ -681,6 +725,7 @@ export interface FileRoutesById {
   '/(errors)/404': typeof errors404LazyRoute
   '/(errors)/500': typeof errors500LazyRoute
   '/(errors)/503': typeof errors503LazyRoute
+  '/(errors)/comingsoon': typeof errorsComingsoonLazyRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountLazyRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceLazyRoute
@@ -694,6 +739,7 @@ export interface FileRoutesById {
   '/_authenticated/library/': typeof AuthenticatedLibraryIndexLazyRoute
   '/_authenticated/products/': typeof AuthenticatedProductsIndexLazyRoute
   '/_authenticated/publishers/': typeof AuthenticatedPublishersIndexLazyRoute
+  '/_authenticated/purchase-history/': typeof AuthenticatedPurchaseHistoryIndexLazyRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexLazyRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexLazyRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexLazyRoute
@@ -714,6 +760,7 @@ export interface FileRouteTypes {
     | '/403'
     | '/404'
     | '/503'
+    | '/comingsoon'
     | '/'
     | '/settings/account'
     | '/settings/appearance'
@@ -727,6 +774,7 @@ export interface FileRouteTypes {
     | '/library'
     | '/products'
     | '/publishers'
+    | '/purchase-history'
     | '/settings/'
     | '/tasks'
     | '/users'
@@ -742,6 +790,7 @@ export interface FileRouteTypes {
     | '/403'
     | '/404'
     | '/503'
+    | '/comingsoon'
     | '/'
     | '/settings/account'
     | '/settings/appearance'
@@ -755,6 +804,7 @@ export interface FileRouteTypes {
     | '/library'
     | '/products'
     | '/publishers'
+    | '/purchase-history'
     | '/settings'
     | '/tasks'
     | '/users'
@@ -773,6 +823,7 @@ export interface FileRouteTypes {
     | '/(errors)/404'
     | '/(errors)/500'
     | '/(errors)/503'
+    | '/(errors)/comingsoon'
     | '/_authenticated/'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/appearance'
@@ -786,6 +837,7 @@ export interface FileRouteTypes {
     | '/_authenticated/library/'
     | '/_authenticated/products/'
     | '/_authenticated/publishers/'
+    | '/_authenticated/purchase-history/'
     | '/_authenticated/settings/'
     | '/_authenticated/tasks/'
     | '/_authenticated/users/'
@@ -805,6 +857,7 @@ export interface RootRouteChildren {
   errors404LazyRoute: typeof errors404LazyRoute
   errors500LazyRoute: typeof errors500LazyRoute
   errors503LazyRoute: typeof errors503LazyRoute
+  errorsComingsoonLazyRoute: typeof errorsComingsoonLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -820,6 +873,7 @@ const rootRouteChildren: RootRouteChildren = {
   errors404LazyRoute: errors404LazyRoute,
   errors500LazyRoute: errors500LazyRoute,
   errors503LazyRoute: errors503LazyRoute,
+  errorsComingsoonLazyRoute: errorsComingsoonLazyRoute,
 }
 
 export const routeTree = rootRoute
@@ -843,7 +897,8 @@ export const routeTree = rootRoute
         "/(errors)/403",
         "/(errors)/404",
         "/(errors)/500",
-        "/(errors)/503"
+        "/(errors)/503",
+        "/(errors)/comingsoon"
       ]
     },
     "/_authenticated": {
@@ -859,6 +914,7 @@ export const routeTree = rootRoute
         "/_authenticated/library/",
         "/_authenticated/products/",
         "/_authenticated/publishers/",
+        "/_authenticated/purchase-history/",
         "/_authenticated/tasks/",
         "/_authenticated/users/"
       ]
@@ -906,6 +962,9 @@ export const routeTree = rootRoute
     },
     "/(errors)/503": {
       "filePath": "(errors)/503.lazy.tsx"
+    },
+    "/(errors)/comingsoon": {
+      "filePath": "(errors)/comingsoon.lazy.tsx"
     },
     "/_authenticated/": {
       "filePath": "_authenticated/index.tsx",
@@ -957,6 +1016,10 @@ export const routeTree = rootRoute
     },
     "/_authenticated/publishers/": {
       "filePath": "_authenticated/publishers/index.lazy.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/purchase-history/": {
+      "filePath": "_authenticated/purchase-history/index.lazy.ts",
       "parent": "/_authenticated"
     },
     "/_authenticated/settings/": {

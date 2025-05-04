@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { SERVER_API_URL } from '@/utils'
 import { useAuthStore } from '@/stores/authStore'
+import { CustomerPurchase } from '@/utils/types'
 
 export const shopService = {
   purchase: async (id: string) => {
@@ -18,7 +19,7 @@ export const shopService = {
       .then((res) => res.data)
     return res
   },
-  getPurchases: async () => {
+  getPurchases: async (): Promise<CustomerPurchase[]> => {
     const token = useAuthStore.getState().auth.accessToken
     const res = await axios
       .get(`${SERVER_API_URL}/Shop/getAllPurchase`, {
@@ -27,18 +28,20 @@ export const shopService = {
         },
       })
       .then((res) => res.data)
-    return res
+    return res.data
   },
-  getCustomerPurchases: async (id: string) => {
+  getCustomerPurchases: async (): Promise<CustomerPurchase[]> => {
+    const user = useAuthStore.getState().auth.user
+
     const token = useAuthStore.getState().auth.accessToken
     const res = await axios
-      .get(`${SERVER_API_URL}/Shop/getCustomerPurchases/${id}`, {
+      .get(`${SERVER_API_URL}/Shop/getCustomerPurchases/${user?.userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
       .then((res) => res.data)
-    return res
+    return res.data
   },
   getCustomerLibrary: async () => {
     const user = useAuthStore.getState().auth.user

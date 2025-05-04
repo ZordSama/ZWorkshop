@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 import {
   IconAdjustmentsHorizontal,
   IconSortAscendingLetters,
   IconSortDescendingLetters,
 } from '@tabler/icons-react'
+import { shopService } from '@/services/shop'
 import { SERVER_PUBLIC_URL } from '@/utils'
+import { Play } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -20,9 +24,7 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import AppDetails from '../components/app-details'
 import { Product, productListSchema } from '../products/data/schema'
-import { shopService } from '@/services/shop'
 
 const appText = new Map<string, string>([
   ['all', 'All Apps'],
@@ -83,15 +85,15 @@ export default function Library() {
       {/* ===== Content ===== */}
       <Main fixed>
         <div>
-          <h1 className='text-2xl font-bold tracking-tight'>Cửa hàng</h1>
+          <h1 className='text-2xl font-bold tracking-tight'>Thư viện</h1>
           <p className='text-muted-foreground'>
-            Dưới đây là danh sách các ứng dụng hiện có trên hệ thống.
+            Thư viện game và ứng dụng của bạn
           </p>
         </div>
         <div className='my-4 flex items-end justify-between sm:my-0 sm:items-center'>
           <div className='flex flex-col gap-4 sm:my-4 sm:flex-row'>
             <Input
-              placeholder='Filter apps...'
+              placeholder='Tìm kiếm...'
               className='h-9 w-40 lg:w-[250px]'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -149,15 +151,15 @@ export default function Library() {
                   <div className='flex flex-auto flex-row flex-wrap justify-between'>
                     <h3 className='text-lg font-semibold'>{app.name}</h3>
                     <span className='text-muted-foreground'>
-                      {new Intl.NumberFormat('vi-VN', {
-                        style: 'currency',
-                        currency: 'VND',
-                        currencyDisplay: 'code',
-                      }).format(app.price)}
+                      {app.genre}
                     </span>
                   </div>
-
-                  <AppDetails product={app} isBuyer={true} />
+                  <Link to='/comingsoon' className='flex flex-auto'>
+                    <Button className='flex-auto'>
+                      <Play size={16} />
+                      Chơi
+                    </Button>
+                  </Link>
                 </div>
               </li>
             ))

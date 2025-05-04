@@ -35,8 +35,8 @@ export default function Apps() {
     queryKey: ['testProducts'],
     queryFn: productService.getProducts,
   })
-
   const [products, setProducts] = useState<Product[]>([])
+  const [detailOpen, setDetailOpen] = useState(false)
 
   useEffect(() => {
     if (rawProductsData) {
@@ -91,7 +91,7 @@ export default function Apps() {
         <div className='my-4 flex items-end justify-between sm:my-0 sm:items-center'>
           <div className='flex flex-col gap-4 sm:my-4 sm:flex-row'>
             <Input
-              placeholder='Filter apps...'
+              placeholder='Tìm game/apps...'
               className='h-9 w-40 lg:w-[250px]'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -157,7 +157,11 @@ export default function Apps() {
                     </span>
                   </div>
 
-                  <AppDetails product={app} isBuyer={true} />
+                  <AppDetails
+                    product={app}
+                    open={detailOpen}
+                    onOpenChange={setDetailOpen}
+                  />
                 </div>
               </li>
             ))

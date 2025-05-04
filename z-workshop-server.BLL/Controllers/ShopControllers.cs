@@ -18,7 +18,7 @@ public class ShopController(IShopService shopService) : ControllerBase
         return StatusCode(result.Code, result);
     }
 
-    [HttpPost("getCustomerPurchases/{id}")]
+    [HttpGet("getCustomerPurchases/{id}")]
     [Authorize(Roles = "Admin, SuperAdmin, self")]
     public async Task<IActionResult> GetCustomerPurchases(string id)
     {
@@ -39,7 +39,7 @@ public class ShopController(IShopService shopService) : ControllerBase
     public async Task<IActionResult> Purchase(string id)
     {
         var user = HttpContext.Items["User"] as UserDTO;
-        var result = await _shopService.PurchaseProducts(id, user.UserId);
+        var result = await _shopService.PurchaseProducts(id, user!.UserId);
         return StatusCode(result.Code, result);
     }
 }

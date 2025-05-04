@@ -111,10 +111,6 @@ export function ProductsActionDialog({
   const { data: rawPublishersData } = useQuery({
     queryKey: ['testPublishers'],
     queryFn: publisherService.getPublishers,
-    // refetchOnWindowFocus: false,
-    // refetchOnMount: false,
-    // staleTime: Infinity,
-    // enabled: true,
   })
 
   const [publishers, setPublishers] = useState<Publisher[]>([])
@@ -146,7 +142,6 @@ export function ProductsActionDialog({
         }
       : {
           name: '',
-          price: 0,
           type: 'Game',
           thumbnail: undefined,
           isEdit,
@@ -163,6 +158,7 @@ export function ProductsActionDialog({
       })
       onSuccess()
       onOpenChange(false)
+      form.reset()
     },
   })
 

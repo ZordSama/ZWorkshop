@@ -70,13 +70,13 @@ export const sidebarData: SidebarData = {
           authGroup: ['Admin', 'SuperAdmin'],
         },
         {
-          title: 'Hàng chờ',
-          url: '/tasks',
+          title: 'Lịch sử mua hàng',
+          url: '/purchase-history',
           icon: IconChecklist,
-          authGroup: [],
+          authGroup: ['Customer'],
         },
         {
-          title: 'Quản lý sản phẩm',
+          title: 'Quản lý App/Game',
           url: '/products',
           icon: IconPackages,
           authGroup: ['Admin', 'SuperAdmin'],

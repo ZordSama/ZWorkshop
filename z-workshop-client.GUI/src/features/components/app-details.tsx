@@ -1,7 +1,10 @@
 import { DialogDescription } from '@radix-ui/react-dialog'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { publisherService } from '@/services/publishers'
+import { shopService } from '@/services/shop'
 import { SERVER_PUBLIC_URL } from '@/utils'
+import { useAuthStore } from '@/stores/authStore'
+import { toast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -14,17 +17,45 @@ import { Separator } from '@/components/ui/separator'
 import { Product } from '../products/data/schema'
 
 interface Props {
-  isBuyer: boolean
   product: Product
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export default function AppDetails({ isBuyer, product }: Props) {
+export default function AppDetails({ product, open, onOpenChange }: Props) {
   const { data: rawPublisher } = useQuery({
     queryKey: ['publisher', product.publisherId],
     queryFn: () => publisherService.getPublisher(product.publisherId),
   })
+
+  const purchaseMutation = useMutation({
+    mutationFn: shopService.purchase,
+    onSuccess: () => {
+      toast({
+        title: `Đã mua ${product.name}`,
+        description: `${product.name} đã được thêm vào thư viện của bạn`,
+      })
+      onOpenChange(false)
+    },
+  })
+
+  function onBuyBtnClick() {
+    if (isBuyer) {
+      purchaseMutation.mutate(product.productId)
+    } else {
+      toast({
+        title: 'Bạn không có quyền thực hiện hành động này',
+        description: 'Vui lòng đăng nhập với tài khoản người dùng',
+        variant: 'destructive',
+      })
+    }
+  }
+
+  const userRole = useAuthStore.getState().auth.user?.role || 'Guest'
+  const isBuyer = userRole.includes('Customer')
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button>Chi tiết</Button>
       </DialogTrigger>
@@ -66,10 +97,11 @@ export default function AppDetails({ isBuyer, product }: Props) {
               </span>
             </div>
             <Button
-              className='w-32 bg-green-500 hover:bg-green-600'
+              className={`bg-green-500 hover:bg-green-600 ${isBuyer ? 'w-32' : 'w-96 hover:cursor-not-allowed'}`}
               disabled={!isBuyer}
+              onClick={onBuyBtnClick}
             >
-              Mua
+              {isBuyer ? 'Mua ngay' : 'hãy đăng nhập với tài khoản người dùng'}
             </Button>
           </div>
         </div>

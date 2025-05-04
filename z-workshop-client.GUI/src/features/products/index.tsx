@@ -53,10 +53,10 @@ export default function Products() {
         <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
           <div>
             <h2 className='text-2xl font-bold tracking-tight'>
-              Quản lý nhân viên
+              Quản lý App/Game
             </h2>
             <p className='text-muted-foreground'>
-              Thông tin của nhân viên được hiển thị ở bảng dưới.
+              Thông tin của App/Game được hiển thị ở bảng dưới.
             </p>
           </div>
           <ProductsPrimaryButtons />

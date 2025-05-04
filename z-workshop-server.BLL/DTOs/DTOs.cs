@@ -87,4 +87,15 @@ public class PublisherDTO
     public DateTime? CreatedAt { get; set; }
     public DateTime? LastUpdate { get; set; }
 }
+
+public class PurchaseDTO
+{
+    public string PurchaseId { get; set; } = null!;
+    public string CustomerId { get; set; } = null!;
+    public string CustomerFullname { get; set; } = null!;
+    public string ProductId { get; set; } = null!;
+    public string ProductName { get; set; } = null!;
+    public DateTime? CloseAt { get; set; }
+    public decimal UnitPrice { get; set; } = 0!;
+}
 #endregion
