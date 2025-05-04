@@ -127,11 +127,31 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               </div>
               <div className='relative flex justify-center text-xs uppercase'>
                 <span className='bg-background px-2 text-muted-foreground'>
+                  chưa có tài khoản?
+                </span>
+              </div>
+            </div>
+            <Link to='/sign-up'>
+              <Button
+                type='button'
+                variant={'secondary'}
+                className='h-full w-full'
+                disabled={isLoading}
+              >
+                Đăng ký
+              </Button>
+            </Link>
+            <Link to='/' className='text-sm font-medium text-muted-foreground hover:opacity-75 text-center underline'>Truy cập với tư cách Khách</Link>
+            <div className='relative my-2'>
+              <div className='absolute inset-0 flex items-center'>
+                <span className='w-full border-t' />
+              </div>
+              <div className='relative flex justify-center text-xs uppercase'>
+                <span className='bg-background px-2 text-muted-foreground'>
                   Hoặc sử dụng
                 </span>
               </div>
             </div>
-
             <div className='flex items-center gap-2'>
               <Button
                 variant='outline'

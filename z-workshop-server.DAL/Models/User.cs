@@ -19,8 +19,6 @@ public partial class User
 
     public DateTime? LastUpdate { get; set; }
 
-    public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
-
     public virtual Customer? Customer { get; set; }
 
     public virtual Employee? Employee { get; set; }

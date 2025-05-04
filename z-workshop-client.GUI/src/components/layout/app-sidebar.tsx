@@ -1,4 +1,4 @@
-
+import { useAuthStore } from '@/stores/authStore'
 import {
   Sidebar,
   SidebarContent,
@@ -10,7 +10,6 @@ import { NavGroup } from '@/components/layout/nav-group'
 import { NavUser } from '@/components/layout/nav-user'
 import { TeamSwitcher } from '@/components/layout/team-switcher'
 import { sidebarData } from './data/sidebar-data'
-import { useAuthStore } from '@/stores/authStore'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useAuthStore.getState().auth.user
@@ -22,9 +21,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcher teams={sidebarData.teams} />
       </SidebarHeader>
       <SidebarContent>
-        {sidebarData.navGroups.map((props) => (
-          <NavGroup key={props.title} {...props} />
-        ))}
+        {sidebarData.navGroups.map((props) => {
+          return <NavGroup key={props.title} {...props} />
+        })}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user ? user : sidebarData.user} />

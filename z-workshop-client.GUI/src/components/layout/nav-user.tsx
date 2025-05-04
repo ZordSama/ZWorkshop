@@ -30,7 +30,7 @@ export function NavUser({
 }: {
   user: {
     username: string
-    role: string
+    role: ('Admin' | 'Customer' | 'SuperAdmin' | 'Guest')[]
     avatar?: string | undefined
   }
 }) {

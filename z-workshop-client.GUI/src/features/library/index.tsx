@@ -5,7 +5,6 @@ import {
   IconSortAscendingLetters,
   IconSortDescendingLetters,
 } from '@tabler/icons-react'
-import { productService } from '@/services/products'
 import { SERVER_PUBLIC_URL } from '@/utils'
 import { Input } from '@/components/ui/input'
 import {
@@ -23,6 +22,7 @@ import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 import AppDetails from '../components/app-details'
 import { Product, productListSchema } from '../products/data/schema'
+import { shopService } from '@/services/shop'
 
 const appText = new Map<string, string>([
   ['all', 'All Apps'],
@@ -30,10 +30,10 @@ const appText = new Map<string, string>([
   ['App', 'App'],
 ])
 
-export default function Apps() {
+export default function Library() {
   const { data: rawProductsData, isLoading } = useQuery({
-    queryKey: ['testProducts'],
-    queryFn: productService.getProducts,
+    queryKey: ['getCustomerLib'],
+    queryFn: shopService.getCustomerLibrary,
   })
 
   const [products, setProducts] = useState<Product[]>([])

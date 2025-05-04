@@ -27,11 +27,30 @@ public class PublishersController(IPublisherService publisherService) : Controll
     }
 
     [HttpPost]
-    // [Authorize(Roles = "Admin, SuperAdmin")]
-    [AllowAnonymous]
+    [Authorize(Roles = "Admin, SuperAdmin")]
+    // [AllowAnonymous]
     public async Task<IActionResult> Create(PublisherFormData publisherFormData)
     {
         var result = await _publisherService.CreatePublishertAsync(publisherFormData);
+        return StatusCode(result.Code, result);
+    }
+
+    [HttpPut("{id}")]
+    [Authorize(Roles = "Admin, SuperAdmin")]
+    public async Task<IActionResult> Update(
+        string id,
+        PublisherUpdateFormData publisherUpdateFormData
+    )
+    {
+        var result = await _publisherService.UpdatePublisherAsync(id, publisherUpdateFormData);
+        return StatusCode(result.Code, result);
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin, SuperAdmin")]
+    public async Task<IActionResult> Delete(string id)
+    {
+        var result = await _publisherService.DeletePublisherAsync(id);
         return StatusCode(result.Code, result);
     }
 }

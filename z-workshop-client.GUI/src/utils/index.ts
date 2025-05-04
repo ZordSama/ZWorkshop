@@ -30,4 +30,4 @@ export function handleQueryError(err: any) {
 }
 
 export const SERVER_API_URL = 'http://localhost:5045/api'
-export const SERVER_PUBLIC_URL = 'http://localhost:5045/wwwroot/files'
+export const SERVER_PUBLIC_URL = 'http://localhost:5045/files'

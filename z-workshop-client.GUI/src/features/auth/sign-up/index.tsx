@@ -6,39 +6,39 @@ import { SignUpForm } from './components/sign-up-form'
 export default function SignUp() {
   return (
     <AuthLayout>
-      <Card className='p-6'>
+      <Card className='p-6 w-[400px] md:w-[500px] mx-auto'>
         <div className='mb-2 flex flex-col space-y-2 text-left'>
           <h1 className='text-lg font-semibold tracking-tight'>
-            Create an account
+            Tạo tài khoản mới
           </h1>
           <p className='text-sm text-muted-foreground'>
-            Enter your email and password to create an account. <br />
-            Already have an account?{' '}
+            Nhập đủ thông tin để tạo tài khoản trong hệ thống<br />
+            Bạn đã có tài khoản? hãy {' '}
             <Link
               to='/sign-in'
               className='underline underline-offset-4 hover:text-primary'
             >
-              Sign In
+              Đăng nhập
             </Link>
           </p>
         </div>
         <SignUpForm />
-        <p className='mt-4 px-8 text-center text-sm text-muted-foreground'>
-          By creating an account, you agree to our{' '}
+        <p className='mt-4 px-6 text-center text-sm text-muted-foreground'>
+          Bằng cách đăng ký, bạn đồng ý với{' '}
           <a
             href='/terms'
             className='underline underline-offset-4 hover:text-primary'
           >
-            Terms of Service
+            Điều khoản sử dụng
           </a>{' '}
-          and{' '}
+          và{' '}
           <a
             href='/privacy'
             className='underline underline-offset-4 hover:text-primary'
           >
-            Privacy Policy
-          </a>
-          .
+            Chính sách bảo mật
+          </a>{' '}
+          của chúng tôi.
         </p>
       </Card>
     </AuthLayout>

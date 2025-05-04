@@ -132,17 +132,13 @@ public class PublisherFormData
     public string Email { get; set; } = null!;
 }
 
-public class PublisherUpdateFormData : ProductBaseFormData
+public class PublisherUpdateFormData : PublisherFormData
 {
     public required string PublisherId { get; set; }
 }
 #endregion
 
 #region Orders, User interacts related requests DTOs
-public class PurchaseRequest
-{
-    public required List<ProductToPurchaseDTO> ProductToPurchase { get; set; }
-}
 
 public class UserCommentRequest
 {

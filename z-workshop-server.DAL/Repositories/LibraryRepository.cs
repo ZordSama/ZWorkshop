@@ -25,7 +25,7 @@ public class LibraryRepository : ILibraryRepository
     {
         return await _context
             .Customers.Where(c => c.CustomerId == customerId)
-            .SelectMany(c => c.ProductsNavigation)
+            .SelectMany(c => c.Products)
             .ToListAsync();
     }
 
@@ -33,7 +33,7 @@ public class LibraryRepository : ILibraryRepository
     {
         return await _context
             .Products.Where(p => p.ProductId == productId)
-            .SelectMany(p => p.CustomersNavigation)
+            .SelectMany(p => p.Customers)
             .ToListAsync();
     }
 

@@ -53,11 +53,6 @@ public class EmployeeWithUserDTO
     public UserDTO UserDto { get; set; } = null!;
 }
 
-public class ProductToPurchaseDTO
-{
-    public required string ProductId { get; set; }
-    public int Quantity { get; set; }
-}
 #endregion
 
 #region Product related DTOs

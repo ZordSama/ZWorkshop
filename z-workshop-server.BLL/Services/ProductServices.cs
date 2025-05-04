@@ -16,6 +16,7 @@ public interface IProductService : IZBaseService<Product, ProductDTO>
         ProductUpdateFormData productUpdateFormData,
         string opId
     );
+    Task<ZServiceResult<string>> DeleteProductAsync(string productId);
 }
 
 public class ProductService(
@@ -69,7 +70,7 @@ public class ProductService(
             var fileUrl = "";
             if (productFormData.Thumbnail != null)
             {
-                var fileSaveResult = await FileHelper.SaveFile(
+                var fileSaveResult = await FileHelper.SaveFileAsync(
                     productFormData.Thumbnail,
                     "product_thumbnails",
                     product.ProductId
@@ -126,7 +127,7 @@ public class ProductService(
 
             if (productUpdateFormData.Thumbnail != null)
             {
-                var fileSaveResult = await FileHelper.SaveFile(
+                var fileSaveResult = await FileHelper.SaveFileAsync(
                     productUpdateFormData.Thumbnail,
                     "product_thumbnails",
                     product.ProductId
@@ -154,7 +155,34 @@ public class ProductService(
         }
     }
 
-    // public async Task<ZServiceResult<string>> DeleteProduct(string productId){
+    public async Task<ZServiceResult<string>> DeleteProductAsync(string productId)
+    {
+        try
+        {
+            var product = await _repository.GetByIdAsync(productId);
+            if (product == null)
+                return ZServiceResult<string>.Failure("Không tìm thấy sản phẩm", 404);
+            if (product.Desc != null)
+            {
+                var productDesc = Newtonsoft.Json.JsonConvert.DeserializeObject<ProductDescJsonDTO>(
+                    product.Desc
+                );
 
-    // }
+                if (productDesc != null && productDesc.Thumbnail != null)
+                {
+                    var removeResult = await FileHelper.RemoveFileAsync(productDesc.Thumbnail);
+                    if (!removeResult.IsSuccess)
+                        return removeResult;
+                }
+            }
+            _repository.Delete(product);
+            await _worker.SaveChangesAsync();
+
+            return ZServiceResult<string>.Success("Đã xóa sản phẩm");
+        }
+        catch (System.Exception ex)
+        {
+            return ZServiceResult<string>.Failure(ex.Message);
+        }
+    }
 }

@@ -44,7 +44,7 @@ export const columns: ColumnDef<Product>[] = [
     id: 'name',
     accessorFn: (row) => row.name,
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Tên NPH' />
+      <DataTableColumnHeader column={column} title='Tên sản phẩm' />
     ),
     cell: ({ row }) => {
       return <span>{row.getValue('name')}</span>
@@ -54,13 +54,18 @@ export const columns: ColumnDef<Product>[] = [
     enableGlobalFilter: true,
   },
   {
-    id: 'email',
+    id: 'Price',
     accessorFn: (row) => row.price,
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Email' />
+      <DataTableColumnHeader column={column} title='Giá sản phẩm' />
     ),
     cell: ({ row }) => {
-      return <span>{row.getValue('email')}</span>
+      var price = new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND',
+        currencyDisplay: 'code',
+      }).format(row.getValue('Price'))
+      return <span>{price}</span>
     },
     enableSorting: false,
     enableHiding: true,

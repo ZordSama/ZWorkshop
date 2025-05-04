@@ -1,6 +1,7 @@
 import { ReactNode } from 'react'
 import { Link, useLocation } from '@tanstack/react-router'
 import { ChevronRight } from 'lucide-react'
+import { useAuthStore } from '@/stores/authStore'
 import {
   Collapsible,
   CollapsibleContent,
@@ -58,22 +59,30 @@ const NavBadge = ({ children }: { children: ReactNode }) => (
 )
 
 const SidebarMenuLink = ({ item, href }: { item: NavLink; href: string }) => {
+  const user = useAuthStore.getState().auth.user
+  const userRole = user?.role || 'Guest'
   const { setOpenMobile } = useSidebar()
-  return (
-    <SidebarMenuItem>
-      <SidebarMenuButton
-        asChild
-        isActive={checkIsActive(href, item)}
-        tooltip={item.title}
-      >
-        <Link to={item.url} onClick={() => setOpenMobile(false)}>
-          {item.icon && <item.icon />}
-          <span>{item.title}</span>
-          {item.badge && <NavBadge>{item.badge}</NavBadge>}
-        </Link>
-      </SidebarMenuButton>
-    </SidebarMenuItem>
+
+  if (
+    (item.authGroup && item.authGroup.some((role) => role === userRole)) ||
+    item.authGroup?.length === 0
   )
+    return (
+      <SidebarMenuItem>
+        <SidebarMenuButton
+          asChild
+          isActive={checkIsActive(href, item)}
+          tooltip={item.title}
+        >
+          <Link to={item.url} onClick={() => setOpenMobile(false)}>
+            {item.icon && <item.icon />}
+            <span>{item.title}</span>
+            {item.badge && <NavBadge>{item.badge}</NavBadge>}
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    )
+  return null
 }
 
 const SidebarMenuCollapsible = ({

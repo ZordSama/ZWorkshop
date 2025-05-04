@@ -12,8 +12,6 @@ public partial class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options) { }
 
-    public virtual DbSet<Comment> Comments { get; set; }
-
     public virtual DbSet<Customer> Customers { get; set; }
 
     public virtual DbSet<Employee> Employees { get; set; }
@@ -30,39 +28,6 @@ public partial class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Comment>(entity =>
-        {
-            entity.Property(e => e.CommentId).HasMaxLength(64);
-            entity
-                .Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.ProductId).HasMaxLength(64);
-            entity.Property(e => e.ResponseOf).HasMaxLength(64);
-            entity.Property(e => e.UserId).HasMaxLength(64);
-
-            entity
-                .HasOne(d => d.Product)
-                .WithMany(p => p.Comments)
-                .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Comments_ProductId");
-
-            entity
-                .HasOne(d => d.ResponseOfNavigation)
-                .WithMany(p => p.InverseResponseOfNavigation)
-                .HasForeignKey(d => d.ResponseOf)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Comments_ResponseOf");
-
-            entity
-                .HasOne(d => d.User)
-                .WithMany(p => p.Comments)
-                .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Comments_UserId");
-        });
-
         modelBuilder.Entity<Customer>(entity =>
         {
             entity.ToTable("Customer");
@@ -94,32 +59,6 @@ public partial class AppDbContext : DbContext
             entity
                 .HasMany(d => d.Products)
                 .WithMany(p => p.Customers)
-                .UsingEntity<Dictionary<string, object>>(
-                    "Cart",
-                    r =>
-                        r.HasOne<Product>()
-                            .WithMany()
-                            .HasForeignKey("Product")
-                            .OnDelete(DeleteBehavior.ClientSetNull)
-                            .HasConstraintName("FK_Cart_Product"),
-                    l =>
-                        l.HasOne<Customer>()
-                            .WithMany()
-                            .HasForeignKey("Customer")
-                            .OnDelete(DeleteBehavior.ClientSetNull)
-                            .HasConstraintName("FK_Cart_Customer"),
-                    j =>
-                    {
-                        j.HasKey("Customer", "Product");
-                        j.ToTable("Cart");
-                        j.IndexerProperty<string>("Customer").HasMaxLength(64);
-                        j.IndexerProperty<string>("Product").HasMaxLength(64);
-                    }
-                );
-
-            entity
-                .HasMany(d => d.ProductsNavigation)
-                .WithMany(p => p.CustomersNavigation)
                 .UsingEntity<Dictionary<string, object>>(
                     "Library",
                     r =>

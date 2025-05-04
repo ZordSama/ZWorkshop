@@ -27,14 +27,10 @@ public partial class Product
 
     public virtual Employee ApprovedByNavigation { get; set; } = null!;
 
-    public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
-
     public virtual Publisher Publisher { get; set; } = null!;
 
     public virtual ICollection<PurchaseDetail> PurchaseDetails { get; set; } =
         new List<PurchaseDetail>();
 
     public virtual ICollection<Customer> Customers { get; set; } = new List<Customer>();
-
-    public virtual ICollection<Customer> CustomersNavigation { get; set; } = new List<Customer>();
 }

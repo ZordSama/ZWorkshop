@@ -5,7 +5,7 @@ import { UserAuthForm } from './components/user-auth-form'
 export default function SignIn() {
   return (
     <AuthLayout>
-      <Card className='p-6'>
+      <Card className='p-6 mx-auto'>
         <div className='flex flex-col space-y-2 text-left'>
           <h1 className='text-2xl font-semibold tracking-tight'>Đăng nhập</h1>
           <p className='text-sm text-muted-foreground'>

@@ -46,6 +46,12 @@ const AuthenticatedSettingsIndexLazyImport = createFileRoute(
 const AuthenticatedPublishersIndexLazyImport = createFileRoute(
   '/_authenticated/publishers/',
 )()
+const AuthenticatedProductsIndexLazyImport = createFileRoute(
+  '/_authenticated/products/',
+)()
+const AuthenticatedLibraryIndexLazyImport = createFileRoute(
+  '/_authenticated/library/',
+)()
 const AuthenticatedHelpCenterIndexLazyImport = createFileRoute(
   '/_authenticated/help-center/',
 )()
@@ -57,9 +63,6 @@ const AuthenticatedDashboardIndexLazyImport = createFileRoute(
 )()
 const AuthenticatedCustomersIndexLazyImport = createFileRoute(
   '/_authenticated/customers/',
-)()
-const AuthenticatedChatsIndexLazyImport = createFileRoute(
-  '/_authenticated/chats/',
 )()
 const AuthenticatedAppsIndexLazyImport = createFileRoute(
   '/_authenticated/apps/',
@@ -221,6 +224,24 @@ const AuthenticatedPublishersIndexLazyRoute =
     ),
   )
 
+const AuthenticatedProductsIndexLazyRoute =
+  AuthenticatedProductsIndexLazyImport.update({
+    id: '/products/',
+    path: '/products/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/products/index.lazy').then((d) => d.Route),
+  )
+
+const AuthenticatedLibraryIndexLazyRoute =
+  AuthenticatedLibraryIndexLazyImport.update({
+    id: '/library/',
+    path: '/library/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/library/index.lazy').then((d) => d.Route),
+  )
+
 const AuthenticatedHelpCenterIndexLazyRoute =
   AuthenticatedHelpCenterIndexLazyImport.update({
     id: '/help-center/',
@@ -257,15 +278,6 @@ const AuthenticatedCustomersIndexLazyRoute =
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any).lazy(() =>
     import('./routes/_authenticated/customers/index.lazy').then((d) => d.Route),
-  )
-
-const AuthenticatedChatsIndexLazyRoute =
-  AuthenticatedChatsIndexLazyImport.update({
-    id: '/chats/',
-    path: '/chats/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any).lazy(() =>
-    import('./routes/_authenticated/chats/index.lazy').then((d) => d.Route),
   )
 
 const AuthenticatedAppsIndexLazyRoute = AuthenticatedAppsIndexLazyImport.update(
@@ -459,13 +471,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppsIndexLazyImport
       parentRoute: typeof AuthenticatedRouteImport
     }
-    '/_authenticated/chats/': {
-      id: '/_authenticated/chats/'
-      path: '/chats'
-      fullPath: '/chats'
-      preLoaderRoute: typeof AuthenticatedChatsIndexLazyImport
-      parentRoute: typeof AuthenticatedRouteImport
-    }
     '/_authenticated/customers/': {
       id: '/_authenticated/customers/'
       path: '/customers'
@@ -492,6 +497,20 @@ declare module '@tanstack/react-router' {
       path: '/help-center'
       fullPath: '/help-center'
       preLoaderRoute: typeof AuthenticatedHelpCenterIndexLazyImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
+    '/_authenticated/library/': {
+      id: '/_authenticated/library/'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof AuthenticatedLibraryIndexLazyImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
+    '/_authenticated/products/': {
+      id: '/_authenticated/products/'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof AuthenticatedProductsIndexLazyImport
       parentRoute: typeof AuthenticatedRouteImport
     }
     '/_authenticated/publishers/': {
@@ -557,11 +576,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteLazyRoute: typeof AuthenticatedSettingsRouteLazyRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAppsIndexLazyRoute: typeof AuthenticatedAppsIndexLazyRoute
-  AuthenticatedChatsIndexLazyRoute: typeof AuthenticatedChatsIndexLazyRoute
   AuthenticatedCustomersIndexLazyRoute: typeof AuthenticatedCustomersIndexLazyRoute
   AuthenticatedDashboardIndexLazyRoute: typeof AuthenticatedDashboardIndexLazyRoute
   AuthenticatedEmployeesIndexLazyRoute: typeof AuthenticatedEmployeesIndexLazyRoute
   AuthenticatedHelpCenterIndexLazyRoute: typeof AuthenticatedHelpCenterIndexLazyRoute
+  AuthenticatedLibraryIndexLazyRoute: typeof AuthenticatedLibraryIndexLazyRoute
+  AuthenticatedProductsIndexLazyRoute: typeof AuthenticatedProductsIndexLazyRoute
   AuthenticatedPublishersIndexLazyRoute: typeof AuthenticatedPublishersIndexLazyRoute
   AuthenticatedTasksIndexLazyRoute: typeof AuthenticatedTasksIndexLazyRoute
   AuthenticatedUsersIndexLazyRoute: typeof AuthenticatedUsersIndexLazyRoute
@@ -572,11 +592,12 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedSettingsRouteLazyRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedAppsIndexLazyRoute: AuthenticatedAppsIndexLazyRoute,
-  AuthenticatedChatsIndexLazyRoute: AuthenticatedChatsIndexLazyRoute,
   AuthenticatedCustomersIndexLazyRoute: AuthenticatedCustomersIndexLazyRoute,
   AuthenticatedDashboardIndexLazyRoute: AuthenticatedDashboardIndexLazyRoute,
   AuthenticatedEmployeesIndexLazyRoute: AuthenticatedEmployeesIndexLazyRoute,
   AuthenticatedHelpCenterIndexLazyRoute: AuthenticatedHelpCenterIndexLazyRoute,
+  AuthenticatedLibraryIndexLazyRoute: AuthenticatedLibraryIndexLazyRoute,
+  AuthenticatedProductsIndexLazyRoute: AuthenticatedProductsIndexLazyRoute,
   AuthenticatedPublishersIndexLazyRoute: AuthenticatedPublishersIndexLazyRoute,
   AuthenticatedTasksIndexLazyRoute: AuthenticatedTasksIndexLazyRoute,
   AuthenticatedUsersIndexLazyRoute: AuthenticatedUsersIndexLazyRoute,
@@ -604,11 +625,12 @@ export interface FileRoutesByFullPath {
   '/settings/display': typeof AuthenticatedSettingsDisplayLazyRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsLazyRoute
   '/apps': typeof AuthenticatedAppsIndexLazyRoute
-  '/chats': typeof AuthenticatedChatsIndexLazyRoute
   '/customers': typeof AuthenticatedCustomersIndexLazyRoute
   '/dashboard': typeof AuthenticatedDashboardIndexLazyRoute
   '/employees': typeof AuthenticatedEmployeesIndexLazyRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexLazyRoute
+  '/library': typeof AuthenticatedLibraryIndexLazyRoute
+  '/products': typeof AuthenticatedProductsIndexLazyRoute
   '/publishers': typeof AuthenticatedPublishersIndexLazyRoute
   '/settings/': typeof AuthenticatedSettingsIndexLazyRoute
   '/tasks': typeof AuthenticatedTasksIndexLazyRoute
@@ -632,11 +654,12 @@ export interface FileRoutesByTo {
   '/settings/display': typeof AuthenticatedSettingsDisplayLazyRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsLazyRoute
   '/apps': typeof AuthenticatedAppsIndexLazyRoute
-  '/chats': typeof AuthenticatedChatsIndexLazyRoute
   '/customers': typeof AuthenticatedCustomersIndexLazyRoute
   '/dashboard': typeof AuthenticatedDashboardIndexLazyRoute
   '/employees': typeof AuthenticatedEmployeesIndexLazyRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexLazyRoute
+  '/library': typeof AuthenticatedLibraryIndexLazyRoute
+  '/products': typeof AuthenticatedProductsIndexLazyRoute
   '/publishers': typeof AuthenticatedPublishersIndexLazyRoute
   '/settings': typeof AuthenticatedSettingsIndexLazyRoute
   '/tasks': typeof AuthenticatedTasksIndexLazyRoute
@@ -664,11 +687,12 @@ export interface FileRoutesById {
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayLazyRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsLazyRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexLazyRoute
-  '/_authenticated/chats/': typeof AuthenticatedChatsIndexLazyRoute
   '/_authenticated/customers/': typeof AuthenticatedCustomersIndexLazyRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexLazyRoute
   '/_authenticated/employees/': typeof AuthenticatedEmployeesIndexLazyRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexLazyRoute
+  '/_authenticated/library/': typeof AuthenticatedLibraryIndexLazyRoute
+  '/_authenticated/products/': typeof AuthenticatedProductsIndexLazyRoute
   '/_authenticated/publishers/': typeof AuthenticatedPublishersIndexLazyRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexLazyRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexLazyRoute
@@ -696,11 +720,12 @@ export interface FileRouteTypes {
     | '/settings/display'
     | '/settings/notifications'
     | '/apps'
-    | '/chats'
     | '/customers'
     | '/dashboard'
     | '/employees'
     | '/help-center'
+    | '/library'
+    | '/products'
     | '/publishers'
     | '/settings/'
     | '/tasks'
@@ -723,11 +748,12 @@ export interface FileRouteTypes {
     | '/settings/display'
     | '/settings/notifications'
     | '/apps'
-    | '/chats'
     | '/customers'
     | '/dashboard'
     | '/employees'
     | '/help-center'
+    | '/library'
+    | '/products'
     | '/publishers'
     | '/settings'
     | '/tasks'
@@ -753,11 +779,12 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/display'
     | '/_authenticated/settings/notifications'
     | '/_authenticated/apps/'
-    | '/_authenticated/chats/'
     | '/_authenticated/customers/'
     | '/_authenticated/dashboard/'
     | '/_authenticated/employees/'
     | '/_authenticated/help-center/'
+    | '/_authenticated/library/'
+    | '/_authenticated/products/'
     | '/_authenticated/publishers/'
     | '/_authenticated/settings/'
     | '/_authenticated/tasks/'
@@ -825,11 +852,12 @@ export const routeTree = rootRoute
         "/_authenticated/settings",
         "/_authenticated/",
         "/_authenticated/apps/",
-        "/_authenticated/chats/",
         "/_authenticated/customers/",
         "/_authenticated/dashboard/",
         "/_authenticated/employees/",
         "/_authenticated/help-center/",
+        "/_authenticated/library/",
+        "/_authenticated/products/",
         "/_authenticated/publishers/",
         "/_authenticated/tasks/",
         "/_authenticated/users/"
@@ -903,10 +931,6 @@ export const routeTree = rootRoute
       "filePath": "_authenticated/apps/index.lazy.tsx",
       "parent": "/_authenticated"
     },
-    "/_authenticated/chats/": {
-      "filePath": "_authenticated/chats/index.lazy.tsx",
-      "parent": "/_authenticated"
-    },
     "/_authenticated/customers/": {
       "filePath": "_authenticated/customers/index.lazy.tsx",
       "parent": "/_authenticated"
@@ -921,6 +945,14 @@ export const routeTree = rootRoute
     },
     "/_authenticated/help-center/": {
       "filePath": "_authenticated/help-center/index.lazy.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/library/": {
+      "filePath": "_authenticated/library/index.lazy.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/products/": {
+      "filePath": "_authenticated/products/index.lazy.tsx",
       "parent": "/_authenticated"
     },
     "/_authenticated/publishers/": {

@@ -11,7 +11,7 @@ interface BaseNavItem {
   title: string
   badge?: string
   icon?: React.ElementType
-  authGroup?: ('Customer' | 'Admin' | 'SuperAdmin')[]
+  authGroup?: ('Customer' | 'Admin' | 'SuperAdmin' | 'Guest')[]
 }
 
 type NavLink = BaseNavItem & {

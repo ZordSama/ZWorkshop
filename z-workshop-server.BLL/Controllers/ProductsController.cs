@@ -51,4 +51,12 @@ public class ProductsController(IProductService productService) : ControllerBase
         var result = await _productService.UpdateProduct(id, productFormData, user!.UserId);
         return StatusCode(result.Code, result);
     }
+
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin, SuperAdmin")]
+    public async Task<IActionResult> DeleteProduct(string id)
+    {
+        var result = await _productService.DeleteProductAsync(id);
+        return StatusCode(result.Code, result);
+    }
 }

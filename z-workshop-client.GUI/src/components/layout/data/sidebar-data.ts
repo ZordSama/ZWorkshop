@@ -9,7 +9,6 @@ import {
   IconLayoutDashboard,
   IconLock,
   IconLockAccess,
-  IconMessages,
   IconNotification,
   IconPackages,
   IconPalette,
@@ -28,7 +27,7 @@ export const sidebarData: SidebarData = {
   user: {
     userId: '',
     username: 'Khách',
-    role: 'Guest',
+    role: ['Guest'],
     avatar: undefined,
   },
   teams: [
@@ -59,47 +58,47 @@ export const sidebarData: SidebarData = {
           authGroup: [],
         },
         {
+          title: 'Thư viện',
+          url: '/library',
+          icon: IconLayoutDashboard,
+          authGroup: ['Customer'],
+        },
+        {
           title: 'Tổng quát',
           url: '/dashboard',
           icon: IconLayoutDashboard,
-          authGroup: [],
+          authGroup: ['Admin', 'SuperAdmin'],
         },
         {
           title: 'Hàng chờ',
           url: '/tasks',
           icon: IconChecklist,
-
           authGroup: [],
         },
         {
           title: 'Quản lý sản phẩm',
-          url: '/apps',
+          url: '/products',
           icon: IconPackages,
-          authGroup: [],
-        },{
+          authGroup: ['Admin', 'SuperAdmin'],
+        },
+        {
           title: 'Quản lý nhà phát hành',
           url: '/publishers',
           icon: IconPalette,
-        },
-        {
-          title: 'Nhóm nội bộ',
-          url: '/chats',
-          badge: '3',
-          icon: IconMessages,
-          authGroup: [],
+          authGroup: ['Admin', 'SuperAdmin'],
         },
         {
           title: 'Quản lý nhân viên',
           url: '/employees',
           icon: IconUserShield,
-          authGroup: [],
+          authGroup: ['Admin', 'SuperAdmin'],
         },
         {
           title: 'Quản lý khách hàng',
           url: '/customers',
           icon: IconUsers,
+          authGroup: ['Admin', 'SuperAdmin'],
         },
-
       ],
     },
     {

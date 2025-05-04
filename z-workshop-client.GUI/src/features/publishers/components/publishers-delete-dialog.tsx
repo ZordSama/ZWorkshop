@@ -47,14 +47,14 @@ export function PublishersDeleteDialog({
       open={open}
       onOpenChange={onOpenChange}
       handleConfirm={handleDelete}
-      disabled={value.trim() !== currentRow.name}
+      disabled={value.trim() !== currentRow.email}
       title={
         <span className='text-destructive'>
           <IconAlertTriangle
             className='mr-1 inline-block stroke-destructive'
             size={18}
           />{' '}
-          Xóa nhân viên
+          Xóa nhà phát hành
         </span>
       }
       desc={
